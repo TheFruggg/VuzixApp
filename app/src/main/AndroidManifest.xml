@@ -24,8 +24,10 @@
         </activity>
 
         <activity android:name=".ContactsActivity" />
-        <activity android:name=".NewMessageActivity" />
+        <activity android:name=".MessageActivity" />
         <activity android:name=".SettingsActivity" />
+        <activity android:name=".ConversationActivity" />
+
     </application>
 
 </manifest>
