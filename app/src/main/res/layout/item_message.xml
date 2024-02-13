@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <!-- Received message bubble -->
+    <!-- TextView for received message -->
     <TextView
         android:id="@+id/textViewReceivedMessage"
         android:layout_width="wrap_content"
@@ -13,9 +13,9 @@
         android:padding="8dp"
         android:layout_alignParentStart="true"
         android:layout_marginStart="16dp"
-         android:layout_marginEnd="72dp"/>
+        android:layout_marginEnd="72dp"/>
 
-
+    <!-- TextView for sent message -->
     <TextView
         android:id="@+id/textViewSentMessage"
         android:layout_width="wrap_content"
