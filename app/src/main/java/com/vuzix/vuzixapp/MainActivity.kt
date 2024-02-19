@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.vuzix.vuzixapp.KeyActivity
 
 // Define MainActivity class, extending AppCompatActivity
 class MainActivity : AppCompatActivity() {
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity() {
             Option("New Message") { navigateTo(MessageActivity::class.java) }, // Navigate to MessageActivity
             Option("Contacts") { navigateTo(ContactsActivity::class.java) }, // Navigate to ContactsActivity
             Option("Settings") { navigateTo(SettingsActivity::class.java) }, // Navigate to SettingsActivity
-            Option("Test") { /* Placeholder action */ }, // Placeholder option
+            Option("Test") { KeyActivity().GenerateKeyPair() },
             Option("Exit") { finish() } // Exit the application
         )
 
