@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <!-- TextView for displaying contact name -->
     <TextView
         android:id="@+id/textViewContactName"
         android:layout_width="wrap_content"
@@ -15,6 +16,7 @@
         android:textSize="18sp"
         android:padding="16dp"/>
 
+    <!-- TextView for displaying last message -->
     <TextView
         android:id="@+id/textViewLastMessage"
         android:layout_width="wrap_content"

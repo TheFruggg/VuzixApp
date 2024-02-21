@@ -11,6 +11,7 @@ class MessageActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contacts)
 
+        // List of conversation options
         val options = listOf(
             Option("Conversation 1") { navigateToConversation("Conversation 1") },
             Option("Conversation 2") { navigateToConversation("Conversation 2") },
@@ -19,10 +20,12 @@ class MessageActivity : AppCompatActivity() {
             Option("Conversation 5") { navigateToConversation("Conversation 5") }
         )
 
+        // Setting up ViewPager2 with options adapter
         val viewPager: ViewPager2 = findViewById(R.id.viewPagerContacts)
         viewPager.adapter = OptionAdapter(options)
     }
 
+    // Helper function to navigate to a specific conversation
     private fun navigateToConversation(conversation: String) {
         val intent = Intent(this, ConversationActivity::class.java).apply {
             putExtra("conversation_key", conversation)

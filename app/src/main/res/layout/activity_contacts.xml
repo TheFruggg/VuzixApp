@@ -5,9 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- ViewPager2 for displaying contacts -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPagerContacts"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

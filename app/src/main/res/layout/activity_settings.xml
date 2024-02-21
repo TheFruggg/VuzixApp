@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- TextView for Notifications -->
     <TextView
         android:id="@+id/textViewNotifications"
         android:layout_width="wrap_content"
@@ -15,6 +16,7 @@
         android:textSize="18sp"
         android:padding="16dp"/>
 
+    <!-- Switch for enabling/disabling notifications -->
     <Switch
         android:id="@+id/switchNotifications"
         android:layout_width="wrap_content"
@@ -22,6 +24,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/textViewNotifications"/>
 
+    <!-- TextView for Sound -->
     <TextView
         android:id="@+id/textViewSound"
         android:layout_width="wrap_content"
@@ -32,6 +35,7 @@
         android:textSize="18sp"
         android:padding="16dp"/>
 
+    <!-- Spinner for selecting sound options -->
     <Spinner
         android:id="@+id/spinnerSound"
         android:layout_width="0dp"
@@ -42,6 +46,7 @@
         android:padding="16dp"
         android:entries="@array/sound_options"/>
 
+    <!-- TextView for Privacy -->
     <TextView
         android:id="@+id/textViewPrivacy"
         android:layout_width="wrap_content"
@@ -52,6 +57,7 @@
         android:textSize="18sp"
         android:padding="16dp"/>
 
+    <!-- RadioGroup for selecting privacy options -->
     <RadioGroup
         android:id="@+id/radioGroupPrivacy"
         android:layout_width="0dp"
@@ -62,12 +68,14 @@
         android:orientation="horizontal"
         android:padding="16dp">
 
+        <!-- RadioButton for Public -->
         <RadioButton
             android:id="@+id/radioButtonPublic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Public"/>
 
+        <!-- RadioButton for Private -->
         <RadioButton
             android:id="@+id/radioButtonPrivate"
             android:layout_width="wrap_content"
