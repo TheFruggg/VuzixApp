@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "462484419354",
+    "project_id": "cyphertext-93a85",
+    "storage_bucket": "cyphertext-93a85.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462484419354:android:4cc1caf10c5521913eb2a3",
+        "android_client_info": {
+          "package_name": "com.vuzix.vuzixapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUrtVVGd3g0ixFl5dMydwgfqisaP60Zv8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
