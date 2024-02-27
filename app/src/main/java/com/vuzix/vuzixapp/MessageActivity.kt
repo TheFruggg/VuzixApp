@@ -16,7 +16,8 @@ class MessageActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 
         // List of conversation options
-        val options = listOf(
+        val options = mutableListOf(
+            Option("New Message") { navigateToContacts() }, // Option for New Message
             Option("Conversation 1") { navigateToConversation("Conversation 1") },
             Option("Conversation 2") { navigateToConversation("Conversation 2") },
             Option("Conversation 3") { navigateToConversation("Conversation 3") },
@@ -27,6 +28,12 @@ class MessageActivity : AppCompatActivity() {
         // Setting up ViewPager2 with options adapter
         val viewPager: ViewPager2 = findViewById(R.id.viewPagerContacts)
         viewPager.adapter = OptionAdapter(options)
+    }
+
+    // Helper function to navigate to ContactsActivity for new message
+    private fun navigateToContacts() {
+        val intent = Intent(this, ContactsActivity::class.java)
+        startActivity(intent)
     }
 
     // Helper function to navigate to a specific conversation

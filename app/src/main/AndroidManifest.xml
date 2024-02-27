@@ -31,6 +31,8 @@
         <activity android:name=".ContactSettings" />
         <activity android:name=".CreateAccountActivity" />
         <activity android:name=".SearchAddContactActivity" />
+        <activity android:name=".NewMessageActivity" />
+
 
 
     </application>

@@ -21,12 +21,12 @@ class ContactsActivity : AppCompatActivity() {
 
         // Define options list containing Option objects
         val options = mutableListOf(
-            Option("Add Contact") { navigateTo(SearchAddContactActivity::class.java) },
             Option("Liam") { navigateTo(ContactSettings::class.java) }, // Option for Liam
             Option("Douglas") { navigateTo(ContactSettings::class.java) }, // Option for Douglas
             Option("Joseph") { navigateTo(ContactSettings::class.java) }, // Option for Joseph
             Option("Cameron") { navigateTo(ContactSettings::class.java) }, // Option for Cameron
-            Option("Mark") { navigateTo(ContactSettings::class.java) } // Option for Mark
+            Option("Mark") { navigateTo(ContactSettings::class.java) }, // Option for Mark
+            Option("Add Contact") { navigateTo(com.vuzix.vuzixapp.SearchAddContactActivity::class.java) }
         )
 
 

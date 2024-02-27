@@ -32,16 +32,6 @@
             android:background="@drawable/edit_text_outline"
             android:paddingStart="16dp" />
 
-        <EditText
-            android:id="@+id/editTextUsername"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="10dp"
-            android:hint="Username"
-            android:inputType="text"
-            android:textColorHint="#FF69B4"
-            android:background="@drawable/edit_text_outline"
-            android:paddingStart="16dp" />
 
         <EditText
             android:id="@+id/editTextEmail"

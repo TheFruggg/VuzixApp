@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
         // Define a list of options to display in the ViewPager
         val options = listOf(
-            Option("New Message") { navigateTo(MessageActivity::class.java) }, // Navigate to MessageActivity
+            Option("Messages") { navigateTo(MessageActivity::class.java) }, // Navigate to MessageActivity
             Option("Contacts") { navigateTo(ContactsActivity::class.java) }, // Navigate to ContactsActivity
             Option("Settings") { navigateTo(SettingsActivity::class.java) }, // Navigate to SettingsActivity
             Option("Test") { KeyActivity().GenerateKeyPair() },
