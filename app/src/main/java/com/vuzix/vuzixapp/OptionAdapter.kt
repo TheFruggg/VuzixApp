@@ -16,6 +16,8 @@ class OptionAdapter(private val options: List<Option>) :
         return OptionViewHolder(button)
     }
 
+
+
     // Function to bind data to each ViewHolder
     override fun onBindViewHolder(holder: OptionViewHolder, position: Int) {
         val option = options[position]

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:gravity="center"
+    android:fitsSystemWindows="true">
+
+    <EditText
+        android:id="@+id/editTextEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:hint="Enter Email"
+        android:background="@drawable/edit_text_outline"
+        android:textColorHint="#FF69B4"
+        android:inputType="textEmailAddress"
+        android:minHeight="60dp"
+        android:paddingStart="16dp" />
+
+    <Button
+        android:id="@+id/buttonAdd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/rounded_button_background"
+        android:layout_below="@id/editTextEmail" />
+
+</RelativeLayout>

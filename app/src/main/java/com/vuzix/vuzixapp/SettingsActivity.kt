@@ -1,6 +1,7 @@
 package com.vuzix.vuzixapp
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 
 class SettingsActivity : AppCompatActivity() {
@@ -10,5 +11,8 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // Set the content view to the activity_settings layout
         setContentView(R.layout.activity_settings)
+
+        // Hide the navigation bar
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
     }
 }

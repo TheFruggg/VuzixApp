@@ -1,6 +1,7 @@
 package com.vuzix.vuzixapp
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +16,9 @@ class ConversationActivity : AppCompatActivity() {
     // Override onCreate method to initialize the activity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Hide the navigation bar
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 
         // Set the layout for this activity
         setContentView(R.layout.activity_conversation)

@@ -13,7 +13,7 @@
         android:theme="@style/Theme.VuzixApp"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".LoginActivity"
             android:exported="true">
 
             <intent-filter>
@@ -23,11 +23,15 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".MainActivity" />
         <activity android:name=".ContactsActivity" />
         <activity android:name=".MessageActivity" />
         <activity android:name=".SettingsActivity" />
         <activity android:name=".ConversationActivity" />
         <activity android:name=".ContactSettings" />
+        <activity android:name=".CreateAccountActivity" />
+        <activity android:name=".SearchAddContactActivity" />
+
 
     </application>
 

@@ -2,6 +2,7 @@ package com.vuzix.vuzixapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 
@@ -12,17 +13,22 @@ class ContactsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Hide the navigation bar
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+
         // Set the layout for this activity
         setContentView(R.layout.activity_contacts)
 
         // Define options list containing Option objects
-        val options = listOf(
+        val options = mutableListOf(
+            Option("Add Contact") { navigateTo(SearchAddContactActivity::class.java) },
             Option("Liam") { navigateTo(ContactSettings::class.java) }, // Option for Liam
             Option("Douglas") { navigateTo(ContactSettings::class.java) }, // Option for Douglas
             Option("Joseph") { navigateTo(ContactSettings::class.java) }, // Option for Joseph
             Option("Cameron") { navigateTo(ContactSettings::class.java) }, // Option for Cameron
             Option("Mark") { navigateTo(ContactSettings::class.java) } // Option for Mark
         )
+
 
         // Find the ViewPager2 view in the layout and assign it to viewPager variable
         val viewPager: ViewPager2 = findViewById(R.id.viewPagerContacts)

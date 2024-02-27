@@ -2,7 +2,9 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.VuzixApp" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">#F04392</item> <!-- Set button color -->
+        <item name="android:windowBackground">@android:color/transparent</item> <!-- Set background to transparent -->
+        <item name="android:windowFullscreen">true</item> <!-- Hide notification bar -->
     </style>
 
     <style name="Theme.VuzixApp" parent="Base.Theme.VuzixApp" />
