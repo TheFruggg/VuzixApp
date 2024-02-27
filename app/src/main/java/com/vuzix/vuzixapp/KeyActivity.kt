@@ -17,7 +17,10 @@ class KeyActivity : AppCompatActivity() {
 
     private val KEY_ALIAS = "MyKeyAlias"
 
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+    }
 
     fun GenerateKeyPair() {
         try {
