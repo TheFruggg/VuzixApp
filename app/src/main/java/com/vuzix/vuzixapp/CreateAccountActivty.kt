@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.messaging.FirebaseMessaging
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.IOException
 import okio.Buffer // Import Buffer from okio package
 
@@ -16,6 +17,8 @@ class CreateAccountActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Hide the status bar and make the activity fullscreen
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         setContentView(R.layout.activity_create_account)
 
         val buttonCreateAccount: Button = findViewById(R.id.buttonCreateAccount)
@@ -56,16 +59,22 @@ class CreateAccountActivity : AppCompatActivity() {
             }
     }
 
-    private fun sendPostRequest(token: String?, firstName: String?, lastName: String?, email: String?, password: String?) {
+    private fun sendPostRequest(token: String, firstName: String, lastName: String, email: String, password: String) {
+
         val client = OkHttpClient()
-        val url = "https://cypher-text.com:443/api/signup"
-        val requestBody = FormBody.Builder()
-            .add("token", token ?: "")
-            .add("firstName", firstName ?: "")
-            .add("lastName", lastName ?: "")
-            .add("email", email ?: "")
-            .add("password", password ?: "")
-            .build()
+        val url = "https://cypher-text.com:3000/signup"
+        val requestBody = RequestBody.create(
+            "application/json".toMediaTypeOrNull(), """
+        {   
+            "token": "$token",
+            "firstName": "$firstName",
+            "lastName": "$lastName",
+            "email": "$email",
+            "password": "$password"
+        }
+        """.trimIndent())
+
+
 
         // Log the request body
         val requestBodyString = requestBodyToString(requestBody)

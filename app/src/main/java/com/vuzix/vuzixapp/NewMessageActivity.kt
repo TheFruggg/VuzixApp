@@ -10,6 +10,8 @@ class NewMessageActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Hide the status bar and make the activity fullscreen
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         setContentView(R.layout.activity_new_message)
 
         val editTextRecipient: EditText = findViewById(R.id.editTextRecipient)

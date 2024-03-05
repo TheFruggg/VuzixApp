@@ -12,7 +12,7 @@ class SettingsActivity : AppCompatActivity() {
         // Set the content view to the activity_settings layout
         setContentView(R.layout.activity_settings)
 
-        // Hide the navigation bar
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        // Hide the status bar and make the activity fullscreen
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
     }
 }

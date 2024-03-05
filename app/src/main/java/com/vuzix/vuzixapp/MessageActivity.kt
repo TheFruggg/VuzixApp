@@ -4,30 +4,33 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.viewpager2.widget.ViewPager2
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class MessageActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_contacts)
+        setContentView(R.layout.activity_main) // Use the same layout as MainActivity
 
-        // Hide the navigation bar
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        // Hide the status bar and make the activity fullscreen
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
 
         // List of conversation options
-        val options = mutableListOf(
-            Option("New Message") { navigateToContacts() }, // Option for New Message
-            Option("Conversation 1") { navigateToConversation("Conversation 1") },
-            Option("Conversation 2") { navigateToConversation("Conversation 2") },
-            Option("Conversation 3") { navigateToConversation("Conversation 3") },
-            Option("Conversation 4") { navigateToConversation("Conversation 4") },
-            Option("Conversation 5") { navigateToConversation("Conversation 5") }
+        val options = listOf(
+            "New Message", "Conversation 1", "Conversation 2",
+            "Conversation 3", "Conversation 4", "Conversation 5"
         )
 
-        // Setting up ViewPager2 with options adapter
-        val viewPager: ViewPager2 = findViewById(R.id.viewPagerContacts)
-        viewPager.adapter = OptionAdapter(options)
+        // Setting up RecyclerView with options adapter
+        val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.adapter = MenuAdapter(options) { position ->
+            when (position) {
+                0 -> navigateToContacts() // New Message
+                else -> navigateToConversation("Conversation ${position + 1}")
+            }
+        }
     }
 
     // Helper function to navigate to ContactsActivity for new message
