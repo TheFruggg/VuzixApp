@@ -14,7 +14,6 @@ class NewMessageActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         setContentView(R.layout.activity_new_message)
 
-        val editTextRecipient: EditText = findViewById(R.id.editTextRecipient)
         val editTextMessage: EditText = findViewById(R.id.editTextMessage)
         val buttonSend: Button = findViewById(R.id.buttonSend)
 

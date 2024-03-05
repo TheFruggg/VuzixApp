@@ -1,4 +1,3 @@
-// LoginActivity.kt
 package com.vuzix.vuzixapp
 
 import android.content.Intent
@@ -26,8 +25,6 @@ class LoginActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         setContentView(R.layout.activity_login)
 
-
-
         val buttonLogin = findViewById<Button>(R.id.buttonLogin)
         buttonLogin.setOnClickListener {
             // Handle login logic here
@@ -36,14 +33,7 @@ class LoginActivity : AppCompatActivity() {
             val loginEmail = loginTextEmail.text.toString()
             val loginPassword = loginTextPassword.text.toString()
             loginPostRequest(loginEmail, loginPassword)
-
-            // For testing purposes, just navigate to MainActivity
-            //startActivity(Intent(this, MainActivity::class.java))
-            //finish() // Close the login activity
-
         }
-
-
 
         val buttonCreateAccount = findViewById<Button>(R.id.buttonCreateAccount)
         buttonCreateAccount.setOnClickListener {
@@ -51,6 +41,7 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, CreateAccountActivity::class.java))
         }
     }
+
     private fun loginPostRequest(email: String, password: String) {
         val client = OkHttpClient()
         val url = "https://cypher-text.com:3000/login"
@@ -76,8 +67,9 @@ class LoginActivity : AppCompatActivity() {
                 override fun onFailure(call: Call, e: IOException) {
                     // Handle failure, e.g., network issues
                     Log.e("Error", "Error occurred: ${e.message}", e)
-                    Toast.makeText(this@LoginActivity, "Failed to send request", Toast.LENGTH_SHORT).show()
-
+                    runOnUiThread {
+                        Toast.makeText(this@LoginActivity, "Failed to send request", Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 override fun onResponse(call: Call, response: Response) {
@@ -88,33 +80,24 @@ class LoginActivity : AppCompatActivity() {
                     if (responseBody?.contains("Login successful", ignoreCase = true) == true) {
                         // The response message contains "successful"
                         runOnUiThread {
-                            Toast.makeText(
-                                this@LoginActivity,
-                                "Response: $responseBody",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(this@LoginActivity, "Response: $responseBody", Toast.LENGTH_SHORT).show()
                         }
                         navigateToMainActivity()
                     } else {
                         runOnUiThread {
-                            Toast.makeText(
-                                this@LoginActivity,
-                                "Response: $responseBody",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(this@LoginActivity, "Response: $responseBody", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
             })
-
-    }  catch (e: Exception) {
-        // Handle exceptions
-        Log.e("Error", "Error occurred: ${e.message}", e)
-        Toast.makeText(this, "An error occurred. Please try again:", Toast.LENGTH_SHORT).show()
-
+        } catch (e: Exception) {
+            // Handle exceptions
+            Log.e("Error", "Error occurred: ${e.message}", e)
+            runOnUiThread {
+                Toast.makeText(this@LoginActivity, "Login Error", Toast.LENGTH_SHORT).show()
+            }
         }
     }
-
 
     // Function to convert RequestBody to String
     private fun requestBodyToString(requestBody: RequestBody): String {
@@ -129,6 +112,7 @@ class LoginActivity : AppCompatActivity() {
         }
         return ""
     }
+
     private fun navigateToMainActivity() {
         // Code to navigate to MainActivity
         // For example:
