@@ -76,8 +76,13 @@ class LoginActivity : AppCompatActivity() {
                 override fun onFailure(call: Call, e: IOException) {
                     // Handle failure, e.g., network issues
                     Log.e("Error", "Error occurred: ${e.message}", e)
-                    Toast.makeText(this@LoginActivity, "Failed to send request", Toast.LENGTH_SHORT).show()
-
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Failed to send request",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
 
                 override fun onResponse(call: Call, response: Response) {
@@ -110,7 +115,13 @@ class LoginActivity : AppCompatActivity() {
     }  catch (e: Exception) {
         // Handle exceptions
         Log.e("Error", "Error occurred: ${e.message}", e)
-        Toast.makeText(this, "An error occurred. Please try again:", Toast.LENGTH_SHORT).show()
+            runOnUiThread {
+                Toast.makeText(
+                    this@LoginActivity,
+                    "Error has occurred",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
         }
     }
