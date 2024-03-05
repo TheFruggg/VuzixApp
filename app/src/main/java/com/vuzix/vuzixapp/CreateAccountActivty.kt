@@ -1,5 +1,6 @@
 package com.vuzix.vuzixapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -51,7 +52,7 @@ class CreateAccountActivity : AppCompatActivity() {
                     // Send a POST request to the server
                     sendPostRequest(token, firstName, lastName, email, password)
                     // Finish the activity and navigate back to the login page
-                    finish()
+
                 } else {
                     // Handle token generation failure
                     Toast.makeText(this, "Failed to generate token", Toast.LENGTH_SHORT).show()
@@ -95,10 +96,30 @@ class CreateAccountActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                // Handle request success
                 val responseBody = response.body?.string()
-                runOnUiThread {
-                    Toast.makeText(this@CreateAccountActivity, "Response: $responseBody", Toast.LENGTH_SHORT).show()
+                Log.d("Response", "Response Body: $responseBody")
+
+                // Check the response message
+                if (responseBody?.contains("User registered successfully!", ignoreCase = true) == true) {
+                    // The response message contains "successful"
+
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@CreateAccountActivity,
+                            "Response: $responseBody",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    navigateToLogin()
+
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@CreateAccountActivity,
+                            "Response: $responseBody",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         })
@@ -116,5 +137,11 @@ class CreateAccountActivity : AppCompatActivity() {
             buffer.close()
         }
         return ""
+    }
+    private fun navigateToLogin() {
+        // Code to navigate to MainActivity
+        // For example:
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
     }
 }
