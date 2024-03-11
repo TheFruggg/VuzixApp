@@ -17,8 +17,14 @@ class NewMessageActivity : AppCompatActivity() {
         val editTextMessage: EditText = findViewById(R.id.editTextMessage)
         val buttonSend: Button = findViewById(R.id.buttonSend)
 
+
+
+
+
+
         buttonSend.setOnClickListener {
             // Implement sending the message here
         }
     }
 }
+

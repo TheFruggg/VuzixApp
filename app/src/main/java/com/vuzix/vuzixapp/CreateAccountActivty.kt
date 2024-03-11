@@ -41,7 +41,7 @@ class CreateAccountActivity : AppCompatActivity() {
                     val lastName = editTextLastName.text.toString()
                     val email = editTextEmail.text.toString()
                     val password = editTextPassword.text.toString()
-
+                    val publicKey = KeyActivity().GenerateKeyPair()
                     // Do something with the token
                     // Show confirmation message
                     Toast.makeText(this, "Token generated successfully: $token", Toast.LENGTH_SHORT).show()
@@ -50,7 +50,7 @@ class CreateAccountActivity : AppCompatActivity() {
                     // Log user information
                     Log.d("CreateAccountActivity", "First Name: $firstName, Last Name: $lastName, Email: $email, Password: $password")
                     // Send a POST request to the server
-                    sendPostRequest(token, firstName, lastName, email, password)
+                    sendPostRequest(token, firstName, lastName, email, password, publicKey)
                     // Finish the activity and navigate back to the login page
 
                 } else {
@@ -60,7 +60,7 @@ class CreateAccountActivity : AppCompatActivity() {
             }
     }
 
-    private fun sendPostRequest(token: String, firstName: String, lastName: String, email: String, password: String) {
+    private fun sendPostRequest(token: String, firstName: String, lastName: String, email: String, password: String, publicKey: String) {
 
         val client = OkHttpClient()
         val url = "https://cypher-text.com:3000/signup"
@@ -71,10 +71,11 @@ class CreateAccountActivity : AppCompatActivity() {
             "firstName": "$firstName",
             "lastName": "$lastName",
             "email": "$email",
-            "password": "$password"
+            "password": "$password",
+            "publicKey": "$publicKey"
         }
-        """.trimIndent())
-
+        """.trimIndent().replace("\n", "").replace("\r", "")
+        )
 
 
         // Log the request body
@@ -110,6 +111,7 @@ class CreateAccountActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+                    KeyActivity().GenerateKeyPair()
                     navigateToLogin()
 
                 } else {
