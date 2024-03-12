@@ -22,14 +22,14 @@ class KeyActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 
-    fun GenerateKeyPair() {
+    fun GenerateKeyPair(): String {
         try {
             val keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
 
-            if (!keyStore.containsAlias(KEY_ALIAS)) {
-                generateKeyPairUsingKeyPairGenerator()
-            }
+
+            generateKeyPairUsingKeyPairGenerator()
+
 
             // Retrieve the private key
             val privateKey = keyStore.getKey(KEY_ALIAS, null) as PrivateKey
@@ -40,16 +40,22 @@ class KeyActivity : AppCompatActivity() {
             // Log the public key
             logPublicKey(publicKey)
 
+            val publicKeyString = Base64.encodeToString(publicKey.encoded, Base64.DEFAULT)
+
             // You can now use the private key as needed
             // For example, you may want to store it securely
 
             // Display success message
             Log.d("KeyPairGeneration", "Key pair generated successfully!")
+            return publicKeyString
+
 
         } catch (e: Exception) {
             e.printStackTrace()
             Log.e("KeyPairGeneration", "Error generating key pair", e)
+            throw e
         }
+
     }
 
     private fun generateKeyPairUsingKeyPairGenerator() {

@@ -26,6 +26,11 @@ class NewMessageActivity : AppCompatActivity() {
         val editTextMessage: EditText = findViewById(R.id.editTextMessage)
         val buttonSend: Button = findViewById(R.id.buttonSend)
 
+
+
+
+
+
         buttonSend.setOnClickListener {
             val recipientEmail = editTextRecipient.text.toString()
             val messageContent = editTextMessage.text.toString()
@@ -94,3 +99,4 @@ class NewMessageActivity : AppCompatActivity() {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 }
+
