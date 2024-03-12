@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
 
     <application
@@ -30,11 +31,15 @@
         <activity android:name=".ContactsActivity" />
         <activity android:name=".MessageActivity" />
         <activity android:name=".SettingsActivity" />
-        <activity android:name=".ConversationActivity" />
         <activity android:name=".ContactSettings" />
         <activity android:name=".CreateAccountActivity" />
         <activity android:name=".SearchAddContactActivity" />
         <activity android:name=".NewMessageActivity" />
+        <activity
+            android:name=".ChatActivity"
+            android:label="Chat Activity">
+        </activity>
+
 
 
 

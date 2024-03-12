@@ -52,6 +52,13 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-messaging:23.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.2")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-inappmessaging-display")
+    implementation ("com.google.firebase:firebase-auth-ktx:21.0.1")
+    implementation ("com.google.firebase:firebase-core:19.0.0")
+    implementation ("com.google.firebase:firebase-firestore:23.0.0")
+
+
 
 
 }

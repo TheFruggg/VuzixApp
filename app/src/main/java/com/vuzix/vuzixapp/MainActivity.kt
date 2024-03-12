@@ -14,18 +14,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val options = listOf(
-            "Messages", "Contacts", "Settings", "Test", "Exit"
+            "New Message", "Chats", "Contacts", "Settings", "Test", "Exit"
         )
 
         val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerView.adapter = MenuAdapter(options) { position ->
             when (position) {
-                0 -> navigateTo(MessageActivity::class.java)
-                1 -> navigateTo(ContactsActivity::class.java)
-                2 -> navigateTo(SettingsActivity::class.java)
-                3 -> KeyActivity().GenerateKeyPair()
-                4 -> finish()
+                0 -> navigateTo(NewMessageActivity::class.java)
+                1 -> navigateTo(ChatActivity::class.java)
+                2 -> navigateTo(ContactsActivity::class.java)
+                3 -> navigateTo(SettingsActivity::class.java)
+                4 -> KeyActivity().GenerateKeyPair()
+                5 -> finish()
             }
         }
     }

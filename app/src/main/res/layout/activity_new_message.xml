@@ -10,7 +10,16 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-
+        <EditText
+            android:id="@+id/editTextRecipient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Recipient Email"
+            android:inputType="textEmailAddress"
+            android:textColorHint="#FF69B4"
+            android:background="@drawable/edit_text_outline"
+            android:paddingStart="16dp"
+            android:layout_marginBottom="16dp"/>
 
         <EditText
             android:id="@+id/editTextMessage"
@@ -18,8 +27,8 @@
             android:layout_height="150dp"
             android:hint="Message"
             android:inputType="textMultiLine"
-            android:background="@drawable/edit_text_outline"
             android:textColorHint="#FF69B4"
+            android:background="@drawable/edit_text_outline"
             android:paddingStart="16dp"
             android:layout_marginBottom="20dp"/>
 
@@ -29,9 +38,6 @@
             android:layout_height="wrap_content"
             android:text="Send"
             android:textColor="#FFFFFF"
-            android:background="@drawable/rounded_button_background"
-            />
-
+            android:background="@drawable/rounded_button_background"/>
     </LinearLayout>
-
 </RelativeLayout>

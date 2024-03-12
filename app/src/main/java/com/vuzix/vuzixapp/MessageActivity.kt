@@ -28,7 +28,7 @@ class MessageActivity : AppCompatActivity() {
         recyclerView.adapter = MenuAdapter(options) { position ->
             when (position) {
                 0 -> navigateToContacts() // New Message
-                else -> navigateToConversation("Conversation ${position + 1}")
+                //else -> navigateToConversation("Conversation ${position + 1}")
             }
         }
     }
@@ -40,10 +40,10 @@ class MessageActivity : AppCompatActivity() {
     }
 
     // Helper function to navigate to a specific conversation
-    private fun navigateToConversation(conversation: String) {
-        val intent = Intent(this, ConversationActivity::class.java).apply {
-            putExtra("conversation_key", conversation)
-        }
-        startActivity(intent)
-    }
+    //private fun navigateToConversation(conversation: String) {
+    //    val intent = Intent(this, ConversationActivity::class.java).apply {
+    //        putExtra("conversation_key", conversation)
+    //    }
+    //    startActivity(intent)
+    //}
 }
