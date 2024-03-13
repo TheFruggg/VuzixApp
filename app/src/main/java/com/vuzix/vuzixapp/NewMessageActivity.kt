@@ -7,12 +7,13 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 
 class NewMessageActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,15 +22,11 @@ class NewMessageActivity : AppCompatActivity() {
         setContentView(R.layout.activity_new_message)
 
         auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
 
         val editTextRecipient: EditText = findViewById(R.id.editTextRecipient)
         val editTextMessage: EditText = findViewById(R.id.editTextMessage)
         val buttonSend: Button = findViewById(R.id.buttonSend)
-
-
-
-
-
 
         buttonSend.setOnClickListener {
             val recipientEmail = editTextRecipient.text.toString()
@@ -51,14 +48,13 @@ class NewMessageActivity : AppCompatActivity() {
             }
 
             // Lookup recipient user ID in Firestore
-            val db = FirebaseFirestore.getInstance()
             db.collection("users")
                 .whereEqualTo("email", recipientEmail)
                 .get()
                 .addOnSuccessListener { documents ->
                     for (document in documents) {
                         val recipientId = document.id
-                        sendMessage(senderId, recipientId, messageContent)
+                        checkConversationExists(senderId, recipientId, messageContent)
                         return@addOnSuccessListener
                     }
                     // Handle case where recipient email doesn't match any user
@@ -71,9 +67,53 @@ class NewMessageActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendMessage(senderId: String, recipientId: String, messageContent: String) {
-        val db = FirebaseFirestore.getInstance()
-        val messagesRef = db.collection("messages")
+    private fun checkConversationExists(senderId: String, recipientId: String, messageContent: String) {
+        // Fetch all conversations for the sender
+        db.collection("conversations")
+            .whereArrayContains("participants", senderId)
+            .get()
+            .addOnSuccessListener { senderConversations ->
+                // Filter sender's conversations based on recipient
+                val matchingConversation = senderConversations.documents.find { conversationDoc ->
+                    val participants = conversationDoc.get("participants") as? List<String>
+                    participants?.contains(recipientId) == true
+                }
+
+                if (matchingConversation != null) {
+                    // Conversation already exists, add message to it
+                    val conversationId = matchingConversation.id
+                    addMessageToConversation(conversationId, senderId, recipientId, messageContent)
+                } else {
+                    // Conversation doesn't exist, create a new one
+                    createConversation(senderId, recipientId, messageContent)
+                }
+            }
+            .addOnFailureListener { e ->
+                // Failed to fetch sender's conversations
+                Toast.makeText(this, "Failed to fetch conversations: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun createConversation(senderId: String, recipientId: String, messageContent: String) {
+        val conversationData = hashMapOf(
+            "participants" to arrayListOf(senderId, recipientId)
+        )
+
+        db.collection("conversations")
+            .add(conversationData)
+            .addOnSuccessListener { documentReference ->
+                // Conversation created successfully, now add message to it
+                val conversationId = documentReference.id
+                addMessageToConversation(conversationId, senderId, recipientId, messageContent)
+            }
+            .addOnFailureListener { e ->
+                // Failed to create conversation
+                Toast.makeText(this, "Failed to create conversation: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun addMessageToConversation(conversationId: String, senderId: String, recipientId: String, messageContent: String) {
+        val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
 
         val message = hashMapOf(
             "senderId" to senderId,
@@ -99,4 +139,3 @@ class NewMessageActivity : AppCompatActivity() {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 }
-

@@ -1,3 +1,4 @@
+// MessageAdapter.kt
 package com.vuzix.vuzixapp
 
 import android.view.LayoutInflater
@@ -5,9 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.vuzix.vuzixapp.Message
 import com.vuzix.vuzixapp.R
 
-class MessageAdapter(private val messages: List<Message>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MessageAdapter(private val messages: List<Message>, private val currentUserId: String) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private val RECEIVED_MESSAGE = 0
+    private val SENT_MESSAGE = 1
 
     inner class ReceivedMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textViewReceivedMessage: TextView = itemView.findViewById(R.id.textViewReceivedMessage)
@@ -43,12 +48,8 @@ class MessageAdapter(private val messages: List<Message>) : RecyclerView.Adapter
         return messages.size
     }
 
-   // override fun getItemViewType(position: Int): Int {
-    //    return if (messages[position].isReceived) RECEIVED_MESSAGE else SENT_MESSAGE
-    //}
-
-    companion object {
-        private const val RECEIVED_MESSAGE = 0
-        private const val SENT_MESSAGE = 1
+    override fun getItemViewType(position: Int): Int {
+        val message = messages[position]
+        return if (message.senderId == currentUserId) SENT_MESSAGE else RECEIVED_MESSAGE
     }
 }

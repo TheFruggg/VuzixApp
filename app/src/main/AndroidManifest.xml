@@ -35,6 +35,7 @@
         <activity android:name=".CreateAccountActivity" />
         <activity android:name=".SearchAddContactActivity" />
         <activity android:name=".NewMessageActivity" />
+        <activity android:name=".MessagesActivity" />
         <activity
             android:name=".ChatActivity"
             android:label="Chat Activity">
