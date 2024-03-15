@@ -16,37 +16,48 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // Hide the status bar and make the activity fullscreen
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+
+        // Set content view using the layout for login
         setContentView(R.layout.activity_login)
 
         // Initialize Firebase
         FirebaseApp.initializeApp(this)
 
+        // Initialize FirebaseAuth
         auth = FirebaseAuth.getInstance()
 
+        // Set click listener for the login button
         val buttonLogin = findViewById<Button>(R.id.buttonLogin)
         buttonLogin.setOnClickListener {
             signIn()
         }
 
+        // Set click listener for the create account button
         val buttonCreateAccount = findViewById<Button>(R.id.buttonCreateAccount)
         buttonCreateAccount.setOnClickListener {
             startActivity(Intent(this, CreateAccountActivity::class.java))
         }
     }
 
+    // Function to sign in with email and password
     private fun signIn() {
+        // Get email and password from EditText fields
         val editTextEmail = findViewById<EditText>(R.id.loginTextEmail)
         val editTextPassword = findViewById<EditText>(R.id.loginTextPassword)
         val email = editTextEmail.text.toString()
         val password = editTextPassword.text.toString()
 
+        // Check if any field is empty
         if (email.isEmpty() || password.isEmpty()) {
+            // Display a toast message if any field is empty
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // Sign in with email and password using FirebaseAuth
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {

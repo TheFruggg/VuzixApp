@@ -11,7 +11,9 @@ class MessageActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main) // Use the same layout as MainActivity
+
+        // Use the same layout as MainActivity
+        setContentView(R.layout.activity_main)
 
         // Hide the status bar and make the activity fullscreen
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -38,12 +40,4 @@ class MessageActivity : AppCompatActivity() {
         val intent = Intent(this, ContactsActivity::class.java)
         startActivity(intent)
     }
-
-    // Helper function to navigate to a specific conversation
-    //private fun navigateToConversation(conversation: String) {
-    //    val intent = Intent(this, ConversationActivity::class.java).apply {
-    //        putExtra("conversation_key", conversation)
-    //    }
-    //    startActivity(intent)
-    //}
 }

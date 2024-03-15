@@ -19,20 +19,27 @@ class CreateAccountActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // Hide the status bar and make the activity fullscreen
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+
+        // Set content view using the layout for creating an account
         setContentView(R.layout.activity_create_account)
 
+        // Initialize FirebaseAuth and FirebaseFirestore
         auth = Firebase.auth
         firestore = FirebaseFirestore.getInstance()
 
+        // Set click listener for the create account button
         val buttonCreateAccount: Button = findViewById(R.id.buttonCreateAccount)
         buttonCreateAccount.setOnClickListener {
             createAccount()
         }
     }
 
+    // Function to create a new user account
     private fun createAccount() {
+        // Get input values from EditText fields
         val editTextFirstName = findViewById<EditText>(R.id.editTextFirstName)
         val editTextLastName = findViewById<EditText>(R.id.editTextLastName)
         val editTextEmail = findViewById<EditText>(R.id.editTextEmail)
@@ -42,11 +49,14 @@ class CreateAccountActivity : AppCompatActivity() {
         val email = editTextEmail.text.toString()
         val password = editTextPassword.text.toString()
 
+        // Check if any field is empty
         if (email.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
+            // Display a toast message if any field is empty
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
 
+        // Create user account with email and password
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -57,8 +67,10 @@ class CreateAccountActivity : AppCompatActivity() {
                         "email" to email
                     )
 
+                    // Get current user ID
                     val userId = auth.currentUser?.uid
                     if (userId != null) {
+                        // Store user info in Firestore
                         firestore.collection("users").document(userId)
                             .set(user)
                             .addOnSuccessListener {
@@ -71,6 +83,7 @@ class CreateAccountActivity : AppCompatActivity() {
                                 Toast.makeText(this, "Failed to create user: ${e.message}", Toast.LENGTH_SHORT).show()
                             }
                     } else {
+                        // Display a toast message if user ID not found
                         Toast.makeText(this, "User ID not found", Toast.LENGTH_SHORT).show()
                     }
                 } else {
@@ -80,10 +93,10 @@ class CreateAccountActivity : AppCompatActivity() {
             }
     }
 
+    // Function to navigate to the login activity
     private fun navigateToLogin() {
-        // Code to navigate to LoginActivity
         val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+        startActivity(intent) // Start LoginActivity
         finish() // Close the current activity
     }
 }

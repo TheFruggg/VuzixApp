@@ -21,13 +21,16 @@ class NewMessageActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         setContentView(R.layout.activity_new_message)
 
+        // Initialize Firebase components
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
+        // Initialize UI elements
         val editTextRecipient: EditText = findViewById(R.id.editTextRecipient)
         val editTextMessage: EditText = findViewById(R.id.editTextMessage)
         val buttonSend: Button = findViewById(R.id.buttonSend)
 
+        // Set OnClickListener for the send button
         buttonSend.setOnClickListener {
             val recipientEmail = editTextRecipient.text.toString()
             val messageContent = editTextMessage.text.toString()
@@ -41,8 +44,7 @@ class NewMessageActivity : AppCompatActivity() {
             // Get logged-in user's ID as the sender ID
             val senderId = auth.currentUser?.uid
             if (senderId == null) {
-                // User is not logged in, handle appropriately (redirect to login page, etc.)
-                // For simplicity, let's just display a toast message
+                // User is not logged in, handle appropriately
                 Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -67,6 +69,7 @@ class NewMessageActivity : AppCompatActivity() {
         }
     }
 
+    // Function to check if conversation exists and create it if necessary
     private fun checkConversationExists(senderId: String, recipientId: String, messageContent: String) {
         // Fetch all conversations for the sender
         db.collection("conversations")
@@ -94,6 +97,7 @@ class NewMessageActivity : AppCompatActivity() {
             }
     }
 
+    // Function to create a new conversation
     private fun createConversation(senderId: String, recipientId: String, messageContent: String) {
         val conversationData = hashMapOf(
             "participants" to arrayListOf(senderId, recipientId)
@@ -112,6 +116,7 @@ class NewMessageActivity : AppCompatActivity() {
             }
     }
 
+    // Function to add message to an existing conversation
     private fun addMessageToConversation(conversationId: String, senderId: String, recipientId: String, messageContent: String) {
         val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
 

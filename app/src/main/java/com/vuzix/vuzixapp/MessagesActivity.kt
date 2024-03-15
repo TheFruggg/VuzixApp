@@ -10,7 +10,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Query
 
-
 class MessagesActivity : AppCompatActivity() {
     private val db = FirebaseFirestore.getInstance()
     private val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -19,9 +18,14 @@ class MessagesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Set content view using the layout for messages activity
         setContentView(R.layout.activity_messages)
 
+        // Get conversation ID passed from intent
         val conversationId = intent.getStringExtra("conversationId")
+
+        // Check if conversation ID is null
         if (conversationId == null) {
             // Handle error or navigate back
             finish()
@@ -36,6 +40,7 @@ class MessagesActivity : AppCompatActivity() {
         fetchMessagesForConversation(conversationId)
     }
 
+    // Function to fetch messages for a conversation from Firestore
     private fun fetchMessagesForConversation(conversationId: String) {
         db.collection("conversations")
             .document(conversationId)
@@ -43,7 +48,10 @@ class MessagesActivity : AppCompatActivity() {
             .orderBy("timestamp", Query.Direction.ASCENDING) // Order messages by timestamp in ascending order
             .get()
             .addOnSuccessListener { documents ->
+                // List to hold fetched messages
                 val messages = mutableListOf<Message>()
+
+                // Iterate through documents to extract message data
                 for (document in documents) {
                     val senderId = document.getString("senderId") ?: ""
                     val content = document.getString("content") ?: ""
@@ -51,6 +59,8 @@ class MessagesActivity : AppCompatActivity() {
                     val message = Message(senderId, userId ?: "", content, timestamp)
                     messages.add(message)
                 }
+
+                // Initialize and set up MessageAdapter with fetched messages
                 messageAdapter = MessageAdapter(messages, userId ?: "")
                 messagesRecyclerView.adapter = messageAdapter
             }
@@ -58,7 +68,4 @@ class MessagesActivity : AppCompatActivity() {
                 // Handle errors
             }
     }
-
-
-
 }
