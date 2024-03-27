@@ -1,6 +1,7 @@
 package com.vuzix.vuzixapp
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -9,6 +10,19 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+
+import java.security.KeyFactory
+
+import java.security.spec.X509EncodedKeySpec
+
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import java.security.KeyPairGenerator
+import java.security.KeyStore
+import java.security.PublicKey
+import java.security.Signature
+import java.util.Base64
+import javax.crypto.Cipher
 
 class NewMessageActivity : AppCompatActivity() {
 
@@ -35,6 +49,8 @@ class NewMessageActivity : AppCompatActivity() {
             val recipientEmail = editTextRecipient.text.toString()
             val messageContent = editTextMessage.text.toString()
 
+
+
             // Validate recipient email format
             if (!isValidEmail(recipientEmail)) {
                 Toast.makeText(this, "Invalid recipient email format", Toast.LENGTH_SHORT).show()
@@ -55,8 +71,9 @@ class NewMessageActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener { documents ->
                     for (document in documents) {
+                        val recipientPublicKey = document.getString("Public") ?: ""
                         val recipientId = document.id
-                        checkConversationExists(senderId, recipientId, messageContent)
+                        checkConversationExists(senderId, recipientId, messageContent, recipientPublicKey)
                         return@addOnSuccessListener
                     }
                     // Handle case where recipient email doesn't match any user
@@ -66,11 +83,12 @@ class NewMessageActivity : AppCompatActivity() {
                     // Handle error
                     Toast.makeText(this, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
                 }
+
         }
     }
 
     // Function to check if conversation exists and create it if necessary
-    private fun checkConversationExists(senderId: String, recipientId: String, messageContent: String) {
+    private fun checkConversationExists(senderId: String, recipientId: String, messageContent: String, recipientPublicKey: String) {
         // Fetch all conversations for the sender
         db.collection("conversations")
             .whereArrayContains("participants", senderId)
@@ -85,10 +103,10 @@ class NewMessageActivity : AppCompatActivity() {
                 if (matchingConversation != null) {
                     // Conversation already exists, add message to it
                     val conversationId = matchingConversation.id
-                    addMessageToConversation(conversationId, senderId, recipientId, messageContent)
+                    addMessageToConversation(conversationId, senderId, recipientId, messageContent,recipientPublicKey)
                 } else {
                     // Conversation doesn't exist, create a new one
-                    createConversation(senderId, recipientId, messageContent)
+                    createConversation(senderId, recipientId, messageContent, recipientPublicKey)
                 }
             }
             .addOnFailureListener { e ->
@@ -98,7 +116,7 @@ class NewMessageActivity : AppCompatActivity() {
     }
 
     // Function to create a new conversation
-    private fun createConversation(senderId: String, recipientId: String, messageContent: String) {
+    private fun createConversation(senderId: String, recipientId: String, messageContent: String, recipientPublicKey: String) {
         val conversationData = hashMapOf(
             "participants" to arrayListOf(senderId, recipientId)
         )
@@ -108,7 +126,7 @@ class NewMessageActivity : AppCompatActivity() {
             .addOnSuccessListener { documentReference ->
                 // Conversation created successfully, now add message to it
                 val conversationId = documentReference.id
-                addMessageToConversation(conversationId, senderId, recipientId, messageContent)
+                addMessageToConversation(conversationId, senderId, recipientId, messageContent, recipientPublicKey)
             }
             .addOnFailureListener { e ->
                 // Failed to create conversation
@@ -117,13 +135,31 @@ class NewMessageActivity : AppCompatActivity() {
     }
 
     // Function to add message to an existing conversation
-    private fun addMessageToConversation(conversationId: String, senderId: String, recipientId: String, messageContent: String) {
+    private fun addMessageToConversation(conversationId: String, senderId: String, recipientId: String, messageContent: String, publicKeyString : String) {
         val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
+
+        Log.d("public key", "public key before decoding: ${publicKeyString}")
+        val publicKeyStringWithoutNewlines = publicKeyString.replace("\n", "")
+        val decodedKey = android.util.Base64.decode(publicKeyStringWithoutNewlines, android.util.Base64.DEFAULT)
+
+        val keyFactory = java.security.KeyFactory.getInstance("RSA")
+        val recipientPublicKey = keyFactory.generatePublic(X509EncodedKeySpec(decodedKey))
+        Log.d("public key", "public key after decoding: ${recipientPublicKey}")
+        val cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
+        cipher.init(Cipher.ENCRYPT_MODE, recipientPublicKey)
+        val encryptedBytes = cipher.doFinal(messageContent.toByteArray())
+        val encryptedMessage = android.util.Base64.encodeToString(encryptedBytes, android.util.Base64.DEFAULT)
+
+
+
+        // Return the encrypted message as Base64 encoded string
+
+
 
         val message = hashMapOf(
             "senderId" to senderId,
             "recipientId" to recipientId,
-            "content" to messageContent,
+            "content" to encryptedMessage,
             "timestamp" to FieldValue.serverTimestamp() // Use server timestamp
         )
 

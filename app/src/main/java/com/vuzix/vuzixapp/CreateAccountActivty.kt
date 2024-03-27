@@ -2,6 +2,7 @@ package com.vuzix.vuzixapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -56,12 +57,15 @@ class CreateAccountActivity : AppCompatActivity() {
             return
         }
 
+        val publicKeyString = KeyActivity().GenerateKeyPair()
+        Log.d("public key", "public key before decoding: ${publicKeyString}")
         // Create user account with email and password
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Sign-up success, store user info in Firestore
                     val user = hashMapOf(
+                        "Public" to publicKeyString,
                         "firstName" to firstName,
                         "lastName" to lastName,
                         "email" to email
