@@ -6,6 +6,29 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewMessages"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_above="@id/layoutSendMessage"/>
+
+    <LinearLayout
+        android:id="@+id/layoutSendMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+
+        <EditText
+            android:id="@+id/editTextMessageReply"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Type your message"/>
+
+        <Button
+            android:id="@+id/buttonSendReply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send"/>
+    </LinearLayout>
 
 </RelativeLayout>

@@ -6,5 +6,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#0000FF</color>
     <color name="transparent">#00000000</color>
+    <color name="button_focused">#FFFFFF</color> <!-- White for focused -->
+    <color name="button_default">#FF69B4</color> <!-- Pink for default -->
 
 </resources>
