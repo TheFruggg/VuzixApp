@@ -1,6 +1,7 @@
 package com.vuzix.vuzixapp
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -22,6 +23,7 @@ class MessagesActivity : AppCompatActivity() {
     private lateinit var buttonSendReply: Button
     private lateinit var conversationId: String
     private var recipientId: String? = null
+    private lateinit var layoutManager: LinearLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,11 +38,20 @@ class MessagesActivity : AppCompatActivity() {
             return
         }
 
+        initViews()
+        setupSendButton()
+        fetchMessagesForConversation(conversationId)
+    }
+
+    private fun initViews() {
         messagesRecyclerView = findViewById(R.id.recyclerViewMessages)
         editTextMessageReply = findViewById(R.id.editTextMessageReply)
         buttonSendReply = findViewById(R.id.buttonSendReply)
-        messagesRecyclerView.layoutManager = LinearLayoutManager(this)
+        layoutManager = LinearLayoutManager(this)
+        messagesRecyclerView.layoutManager = layoutManager
+    }
 
+    private fun setupSendButton() {
         buttonSendReply.setOnClickListener {
             val messageContent = editTextMessageReply.text.toString()
             if (messageContent.isNotBlank()) {
@@ -48,8 +59,6 @@ class MessagesActivity : AppCompatActivity() {
                 editTextMessageReply.text.clear()
             }
         }
-
-        fetchMessagesForConversation(conversationId)
     }
 
     private fun fetchMessagesForConversation(conversationId: String) {
@@ -66,12 +75,17 @@ class MessagesActivity : AppCompatActivity() {
                     val timestamp = document.getTimestamp("timestamp") ?: Timestamp.now()
                     messages.add(Message(senderId, userId ?: "", content, timestamp))
                 }
-                messageAdapter = MessageAdapter(messages, userId ?: "")
-                messagesRecyclerView.adapter = messageAdapter
+                updateUI(messages)
             }
-            .addOnFailureListener { exception ->
-                Toast.makeText(this, "Error fetching messages: ${exception.message}", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error fetching messages: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun updateUI(messages: List<Message>) {
+        messageAdapter = MessageAdapter(messages, userId ?: "")
+        messagesRecyclerView.adapter = messageAdapter
+        if(messages.isNotEmpty()) messagesRecyclerView.scrollToPosition(messages.size - 1) // Scroll to the bottom to show the newest message
     }
 
     private fun sendMessage(content: String) {
@@ -84,10 +98,26 @@ class MessagesActivity : AppCompatActivity() {
 
         db.collection("conversations").document(conversationId).collection("messages").add(messageMap)
             .addOnSuccessListener {
-                Toast.makeText(this, "Message sent.", Toast.LENGTH_SHORT).show()
+                fetchMessagesForConversation(conversationId)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_DPAD_UP -> {
+                // Scroll up
+                messagesRecyclerView.smoothScrollBy(0, -layoutManager.height / 4)
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_DOWN -> {
+                // Scroll down
+                messagesRecyclerView.smoothScrollBy(0, layoutManager.height / 4)
+                return true
+            }
+        }
+        return super.onKeyDown(keyCode, event)
     }
 }
