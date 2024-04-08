@@ -14,9 +14,11 @@ class ConversationAdapter(
     private val onItemClick: (Conversation) -> Unit
 ) : RecyclerView.Adapter<ConversationAdapter.ConversationViewHolder>() {
 
+    // Position of the currently selected item
     private var selectedPosition = RecyclerView.NO_POSITION
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversationViewHolder {
+        // Inflate the layout for each conversation item
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_conversation, parent, false)
         return ConversationViewHolder(view)
     }
@@ -32,12 +34,14 @@ class ConversationAdapter(
             holder.itemView.background = ContextCompat.getDrawable(holder.itemView.context, R.drawable.rounded_background)
         }
 
+        // Fetch user's first name and display it
         otherUserId?.let { userId ->
             getUserFirstName(userId) { firstName ->
                 holder.participantsTextView.text = firstName
             }
         }
 
+        // Handle click event on conversation item
         holder.itemView.setOnClickListener {
             onItemClick(conversation)
             selectItem(position)
@@ -46,6 +50,7 @@ class ConversationAdapter(
 
     override fun getItemCount() = conversations.size
 
+    // Method to update the selected item position
     fun selectItem(position: Int) {
         notifyItemChanged(selectedPosition)
         selectedPosition = position
@@ -53,9 +58,11 @@ class ConversationAdapter(
     }
 
     inner class ConversationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // View holder for conversation item
         val participantsTextView: TextView = itemView.findViewById(R.id.participantsTextView)
     }
 
+    // Method to fetch user's first name from Firestore
     private fun getUserFirstName(userId: String, callback: (String) -> Unit) {
         FirebaseFirestore.getInstance().collection("users").document(userId).get()
             .addOnSuccessListener { documentSnapshot ->
