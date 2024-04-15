@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import java.security.KeyStore
 import java.security.PrivateKey
 import javax.crypto.Cipher
 import java.util.Base64
+import javax.crypto.SecretKey
+import javax.crypto.spec.IvParameterSpec
 
 class MessageAdapter(private val messages: List<Message>, private val currentUserId: String) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -51,22 +52,45 @@ class MessageAdapter(private val messages: List<Message>, private val currentUse
         //val byteArrayMessage = messageToByteArray(message.content)
         //val decodedKey = android.util.Base64.decode(message, android.util.Base64.DEFAULT)
         //val byteArrayMessage = Base64.decode(message, Base64.DEFAULT)
-        val privateKey = getPrivateKey(keyAlias)
-        val decryptedMessage = decryptMessage(message.content,privateKey)
+
 
         if (holder.itemViewType == RECEIVED_MESSAGE) {
+            val privateKey = getPrivateKey(keyAlias)
+            val decryptedMessage = decryptMessage(message.content,privateKey)
             // Bind received message content to ReceivedMessageViewHolder
             val receivedHolder = holder as ReceivedMessageViewHolder
             receivedHolder.textViewReceivedMessage.text = decryptedMessage
         } else {
-            // Bind sent message content to SentMessageViewHolder
-            val sentHolder = holder as SentMessageViewHolder
-            sentHolder.textViewSentMessage.text = decryptedMessage
+            val secretKey =NewMessageActivity().retrieveSymmetricKey()
+            if (secretKey != null) {
+                val decryptedMessage = decryptSymmetricMessage(message.content, secretKey)
+                // Bind sent message content to SentMessageViewHolder
+                val sentHolder = holder as SentMessageViewHolder
+                sentHolder.textViewSentMessage.text = decryptedMessage
+            }
         }
     }
-    fun messageToByteArray(message: String): ByteArray {
-        return message.toByteArray()
+
+
+    fun decryptSymmetricMessage(encryptedMessage: String, secretKey: SecretKey): String {
+        try {
+            val originalData = Base64.getDecoder().decode(encryptedMessage)
+            val iv = originalData.copyOfRange(0, 16) // Extract IV from encrypted data
+            val encryptedBytes = originalData.copyOfRange(16, originalData.size)
+
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
+
+            val decryptedBytes = cipher.doFinal(encryptedBytes)
+            return String(decryptedBytes)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
     }
+
+
     fun getPrivateKey(keyAlias: String): PrivateKey? {
         return try {
             val keyStore = KeyStore.getInstance("AndroidKeyStore")

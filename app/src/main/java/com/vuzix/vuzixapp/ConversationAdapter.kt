@@ -4,73 +4,59 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class ConversationAdapter(
-    private val conversations: List<Conversation>,
-    private val onItemClick: (Conversation) -> Unit
+    private val conversations: List<Conversation>, // List of conversations to display
+    private val onItemClick: (Conversation) -> Unit // Callback for item click
 ) : RecyclerView.Adapter<ConversationAdapter.ConversationViewHolder>() {
 
-    // Position of the currently selected item
-    private var selectedPosition = RecyclerView.NO_POSITION
+    // ViewHolder for conversation items
+    inner class ConversationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val participantsTextView: TextView = itemView.findViewById(R.id.participantsTextView) // TextView for participant names
+    }
 
+    // Create new ViewHolder instance
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConversationViewHolder {
-        // Inflate the layout for each conversation item
+        // Inflate layout for conversation item
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_conversation, parent, false)
         return ConversationViewHolder(view)
     }
 
+    // Bind data to ViewHolder
     override fun onBindViewHolder(holder: ConversationViewHolder, position: Int) {
-        val conversation = conversations[position]
-        val otherUserId = conversation.participants.firstOrNull { it != FirebaseAuth.getInstance().currentUser?.uid }
-
-        // Setting the background based on selection
-        if (position == selectedPosition) {
-            holder.itemView.background = ContextCompat.getDrawable(holder.itemView.context, R.drawable.rounded_background_selected)
-        } else {
-            holder.itemView.background = ContextCompat.getDrawable(holder.itemView.context, R.drawable.rounded_background)
-        }
-
-        // Fetch user's first name and display it
+        val conversation = conversations[position] // Get conversation at current position
+        val otherUserId = conversation.participants.firstOrNull { it != FirebaseAuth.getInstance().currentUser?.uid } // Get ID of the other participant
         otherUserId?.let { userId ->
+            // Get first name of the other participant
             getUserFirstName(userId) { firstName ->
-                holder.participantsTextView.text = firstName
+                holder.participantsTextView.text = firstName // Set first name in TextView
             }
         }
-
-        // Handle click event on conversation item
-        holder.itemView.setOnClickListener {
-            onItemClick(conversation)
-            selectItem(position)
-        }
+        holder.itemView.setOnClickListener { onItemClick(conversation) } // Set click listener on item view
     }
 
-    override fun getItemCount() = conversations.size
-
-    // Method to update the selected item position
-    fun selectItem(position: Int) {
-        notifyItemChanged(selectedPosition)
-        selectedPosition = position
-        notifyItemChanged(selectedPosition)
+    // Get total number of conversations
+    override fun getItemCount(): Int {
+        return conversations.size
     }
 
-    inner class ConversationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // View holder for conversation item
-        val participantsTextView: TextView = itemView.findViewById(R.id.participantsTextView)
-    }
-
-    // Method to fetch user's first name from Firestore
+    // Fetch first name of a user from Firestore
     private fun getUserFirstName(userId: String, callback: (String) -> Unit) {
-        FirebaseFirestore.getInstance().collection("users").document(userId).get()
+        val db = FirebaseFirestore.getInstance() // Get instance of Firestore
+        // Query Firestore to get user's first name
+        db.collection("users")
+            .document(userId)
+            .get()
             .addOnSuccessListener { documentSnapshot ->
-                val firstName = documentSnapshot.getString("firstName") ?: "Unknown"
-                callback(firstName)
+                val firstName = documentSnapshot.getString("firstName") ?: "" // Get first name from document
+                callback(firstName) // Invoke callback with first name
             }
-            .addOnFailureListener {
-                callback("Unknown")
+            .addOnFailureListener { exception ->
+                // Handle failure
+                callback("Unknown") // Set first name as "Unknown" in case of failure
             }
     }
 }

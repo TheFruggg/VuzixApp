@@ -50,14 +50,13 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-messaging:23.4.1")
+    implementation("com.google.firebase:firebase-messaging:23.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.9.2")
     implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-inappmessaging-display")
-    implementation ("com.google.firebase:firebase-auth-ktx:22.3.1")
-    implementation ("com.google.firebase:firebase-core:21.1.1")
-    implementation ("com.google.firebase:firebase-firestore:24.11.0")
-
+    implementation ("com.google.firebase:firebase-auth-ktx:21.0.1")
+    implementation ("com.google.firebase:firebase-core:19.0.0")
+    implementation ("com.google.firebase:firebase-firestore:23.0.0")
 
 
 

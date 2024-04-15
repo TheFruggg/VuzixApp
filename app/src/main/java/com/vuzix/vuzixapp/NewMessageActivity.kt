@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import javax.crypto.SecretKey
+
 
 import java.security.KeyFactory
 
@@ -28,6 +30,8 @@ class NewMessageActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
+    private val SYMMETRIC_KEY_ALIAS = "MySymmetricKeyAlias"
+    private val ANDROID_KEYSTORE_PROVIDER = "AndroidKeyStore"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,6 +108,7 @@ class NewMessageActivity : AppCompatActivity() {
                     // Conversation already exists, add message to it
                     val conversationId = matchingConversation.id
                     addMessageToConversation(conversationId, senderId, recipientId, messageContent,recipientPublicKey)
+                    addMessageToHistory(conversationId, senderId, recipientId, messageContent)
                 } else {
                     // Conversation doesn't exist, create a new one
                     createConversation(senderId, recipientId, messageContent, recipientPublicKey)
@@ -137,7 +142,7 @@ class NewMessageActivity : AppCompatActivity() {
     // Function to add message to an existing conversation
     private fun addMessageToConversation(conversationId: String, senderId: String, recipientId: String, messageContent: String, publicKeyString : String) {
         val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
-
+        val history = 0
         Log.d("public key", "public key before decoding: ${publicKeyString}")
         val publicKeyStringWithoutNewlines = publicKeyString.replace("\n", "")
         val decodedKey = android.util.Base64.decode(publicKeyStringWithoutNewlines, android.util.Base64.DEFAULT)
@@ -160,7 +165,9 @@ class NewMessageActivity : AppCompatActivity() {
             "senderId" to senderId,
             "recipientId" to recipientId,
             "content" to encryptedMessage,
+            "history" to history,
             "timestamp" to FieldValue.serverTimestamp() // Use server timestamp
+
         )
 
         messagesRef.add(message)
@@ -175,8 +182,83 @@ class NewMessageActivity : AppCompatActivity() {
             }
     }
 
+    private fun addMessageToHistory(conversationId: String, senderId: String, recipientId: String, messageContent: String) {
+        val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
+        val history = 1
+
+        val secretKey = retrieveSymmetricKey()
+        //Log.d("public key", "public key before decoding: ${publicKeyString}")
+
+        if (secretKey != null) {
+            val encryptedMessage = encryptMessage(messageContent,secretKey)
+
+            val message = hashMapOf(
+                "senderId" to senderId,
+                "recipientId" to recipientId,
+                "content" to encryptedMessage,
+                "history" to history,
+                "timestamp" to FieldValue.serverTimestamp() // Use server timestamp
+            )
+
+            messagesRef.add(message)
+                .addOnSuccessListener { documentReference ->
+                    // Message sent successfully
+                    Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT).show()
+                    // Optionally, clear the message input field or navigate to another screen
+                }
+                .addOnFailureListener { e ->
+                    // Failed to send message
+                    Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+
+
+        // Return the encrypted message as Base64 encoded string
+
+
+
+
+    }
+    fun encryptMessage(message: String, secretKey: SecretKey): ByteArray {
+        try {
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+
+            val iv = cipher.iv // Get the initialization vector
+            val encryptedBytes = cipher.doFinal(message.toByteArray())
+
+            // Return IV + encrypted message
+            return iv + encryptedBytes
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
     // Function to validate email format
     private fun isValidEmail(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
+    fun retrieveSymmetricKey(): SecretKey? {
+
+        try {
+            val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE_PROVIDER)
+            keyStore.load(null)
+
+            // Check if the symmetric key with the given alias exists
+            if (keyStore.containsAlias(SYMMETRIC_KEY_ALIAS)) {
+                // Retrieve the symmetric key from the keystore
+                val keyEntry = keyStore.getEntry(SYMMETRIC_KEY_ALIAS, null) as KeyStore.SecretKeyEntry
+                return keyEntry.secretKey
+            }
+
+            return null // Symmetric key not found
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
 }
+

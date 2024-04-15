@@ -58,6 +58,8 @@ class CreateAccountActivity : AppCompatActivity() {
         }
 
         val publicKeyString = KeyActivity().GenerateKeyPair()
+
+
         Log.d("public key", "public key before decoding: ${publicKeyString}")
         // Create user account with email and password
         auth.createUserWithEmailAndPassword(email, password)
