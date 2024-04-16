@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_color">#EC935E</color>
+    <color name="accent_colour">#48142C</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blue">#0000FF</color>
+    <color name="transparent">#00000000</color>
+    <color name="button_focused">#FFFFFF</color> <!-- White for focused -->
+    <color name="button_default">#FF69B4</color> <!-- Pink for default -->
+
+</resources>

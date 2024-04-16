@@ -2,6 +2,8 @@
 package com.vuzix.vuzixapp
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,7 +20,7 @@ class MessagesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        Log.d("working messages activity", "its working here 1")
         // Set content view using the layout for messages activity
         setContentView(R.layout.activity_messages)
 
@@ -38,55 +40,74 @@ class MessagesActivity : AppCompatActivity() {
 
         // Fetch messages for the current conversation
         fetchMessagesForConversation(conversationId)
+        Log.d("working messages activity", "its working here 2")
     }
 
-
+    private fun fetchMessagesForConversationold(conversationId: String) {
+        db.collection("conversations")
+            .document(conversationId)
+            .collection("messages")
+            .orderBy("timestamp", Query.Direction.ASCENDING)
+            .get()
+            .addOnSuccessListener { documents ->
+                val messages = mutableListOf<Message>()
+                documents.forEach { document ->
+                    val senderId = document.getString("senderId") ?: ""
+                    val content = document.getString("content") ?: ""
+                    val timestamp = document.getTimestamp("timestamp") ?: Timestamp.now()
+                    messages.add(Message(senderId, userId ?: "", content, timestamp))
+                }
+                //updateUI(messages)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error fetching messages: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
     private fun fetchMessagesForConversation(conversationId: String) {
         // List to hold all fetched messages
-        val allMessages = mutableListOf<Message>()
+        val messages = mutableListOf<Message>()
+        Log.d("working messages activity", "its working here 3")
 
         // Fetch sent messages with history = 1
         db.collection("conversations")
             .document(conversationId)
             .collection("messages")
-            .whereEqualTo("senderId", userId) // Filter messages by senderId (current user)
+            .whereEqualTo("senderId", userId ?: "")
             .whereEqualTo("history", 1) // Filter messages by history field set to 1
-            .orderBy("timestamp", Query.Direction.ASCENDING) // Order messages by timestamp in ascending order
             .get()
             .addOnSuccessListener { documents ->
                 // Iterate through documents to extract sent message data
-                for (document in documents) {
+                documents.forEach { document ->
                     val recipientId = document.getString("recipientId") ?: ""
                     val content = document.getString("content") ?: ""
                     val timestamp = document.getTimestamp("timestamp") ?: Timestamp.now()
-                    val message = Message(userId ?: "",recipientId, content, timestamp)
-                    allMessages.add(message)
+                    messages.add(Message(userId ?: "", recipientId, content, timestamp))
+                    //allMessages.add(message)
+                    Log.d("working messages activity", "its working here 4")
                 }
 
-                // Fetch received messages with history = 0
+                // Fetch sent messages with history = 0
                 db.collection("conversations")
                     .document(conversationId)
                     .collection("messages")
-                    .whereNotEqualTo("senderId", userId) // Filter messages by senderId not equal to current user
+                    .whereEqualTo("recipientId", userId ?: "")
                     .whereEqualTo("history", 0) // Filter messages by history field set to 0
-                    .orderBy("timestamp", Query.Direction.ASCENDING) // Order messages by timestamp in ascending order
                     .get()
                     .addOnSuccessListener { documents ->
-                        // Iterate through documents to extract received message data
-                        for (document in documents) {
-                            val senderId = document.getString("senderId") ?: ""
+                        // Iterate through documents to extract sent message data with history = 0
+                        documents.forEach { document ->
+                            val recipientId = document.getString("recipientId") ?: ""
                             val content = document.getString("content") ?: ""
                             val timestamp = document.getTimestamp("timestamp") ?: Timestamp.now()
-
-                            val message = Message(senderId, userId ?: "", content, timestamp)
-                            allMessages.add(message)
+                            messages.add(Message(userId ?: "", recipientId, content, timestamp))
                         }
 
-                        // Sort allMessages by timestamp in ascending order
-                        allMessages.sortBy { it.timestamp }
+                        // Sort messages by timestamp in ascending order
+                        messages.sortBy { it.timestamp }
 
                         // Initialize and set up MessageAdapter with fetched messages
-                        messageAdapter = MessageAdapter(allMessages, userId ?: "")
+                        Log.d("working messages activity", "help help help")
+                        messageAdapter = MessageAdapter(messages, userId ?: "")
                         messagesRecyclerView.adapter = messageAdapter
                     }
                     .addOnFailureListener { exception ->

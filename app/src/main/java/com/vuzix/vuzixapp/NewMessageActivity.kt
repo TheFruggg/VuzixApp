@@ -132,6 +132,7 @@ class NewMessageActivity : AppCompatActivity() {
                 // Conversation created successfully, now add message to it
                 val conversationId = documentReference.id
                 addMessageToConversation(conversationId, senderId, recipientId, messageContent, recipientPublicKey)
+                addMessageToHistory(conversationId, senderId, recipientId, messageContent)
             }
             .addOnFailureListener { e ->
                 // Failed to create conversation
@@ -190,8 +191,8 @@ class NewMessageActivity : AppCompatActivity() {
         //Log.d("public key", "public key before decoding: ${publicKeyString}")
 
         if (secretKey != null) {
-            val encryptedMessage = encryptMessage(messageContent,secretKey)
-
+            val encryptedBytes = encryptMessage(messageContent,secretKey)
+            val encryptedMessage = android.util.Base64.encodeToString(encryptedBytes, android.util.Base64.DEFAULT)
             val message = hashMapOf(
                 "senderId" to senderId,
                 "recipientId" to recipientId,

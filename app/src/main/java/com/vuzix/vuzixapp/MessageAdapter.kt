@@ -33,10 +33,13 @@ class MessageAdapter(private val messages: List<Message>, private val currentUse
     // Create ViewHolder based on message type
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == RECEIVED_MESSAGE) {
+            Log.d("working test", "its working here 2")
             // Inflate layout for received message and return ReceivedMessageViewHolder
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_received_message, parent, false)
             ReceivedMessageViewHolder(view)
+
         } else {
+            Log.d("working test", "its working here 1")
             // Inflate layout for sent message and return SentMessageViewHolder
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_sent_message, parent, false)
             SentMessageViewHolder(view)
@@ -55,14 +58,17 @@ class MessageAdapter(private val messages: List<Message>, private val currentUse
 
 
         if (holder.itemViewType == RECEIVED_MESSAGE) {
+            Log.d("working test", "private key test")
             val privateKey = getPrivateKey(keyAlias)
             val decryptedMessage = decryptMessage(message.content,privateKey)
             // Bind received message content to ReceivedMessageViewHolder
             val receivedHolder = holder as ReceivedMessageViewHolder
             receivedHolder.textViewReceivedMessage.text = decryptedMessage
         } else {
+            Log.d("working test", "its working here 4")
             val secretKey =NewMessageActivity().retrieveSymmetricKey()
             if (secretKey != null) {
+                Log.d("working test", "its working here 69")
                 val decryptedMessage = decryptSymmetricMessage(message.content, secretKey)
                 // Bind sent message content to SentMessageViewHolder
                 val sentHolder = holder as SentMessageViewHolder
@@ -74,25 +80,31 @@ class MessageAdapter(private val messages: List<Message>, private val currentUse
 
     fun decryptSymmetricMessage(encryptedMessage: String, secretKey: SecretKey): String {
         try {
-            val originalData = Base64.getDecoder().decode(encryptedMessage)
+            Log.d("working test", "symmetric key test")
+            val messageWithoutNewLines = encryptedMessage.replace(Regex("""(\r\n)|\n"""), "")
+            val originalData = Base64.getDecoder().decode(messageWithoutNewLines)
+            //val originalData = encryptedMessage.toByteArray(Charsets.UTF_8)
+            Log.d("working test", "its working here glizz")
             val iv = originalData.copyOfRange(0, 16) // Extract IV from encrypted data
+            Log.d("working test", "its working here 7")
             val encryptedBytes = originalData.copyOfRange(16, originalData.size)
-
+            Log.d("working test", "its working here 8")
             val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
             cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
-
+            Log.d("working test", "symmetric key worked")
             val decryptedBytes = cipher.doFinal(encryptedBytes)
             return String(decryptedBytes)
 
         } catch (e: Exception) {
             e.printStackTrace()
-            throw e
+            return "message decryption for symmetric failed"
         }
     }
 
 
     fun getPrivateKey(keyAlias: String): PrivateKey? {
         return try {
+            Log.d("working test", "its working here 6")
             val keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
             val entry = keyStore.getEntry(keyAlias, null) as KeyStore.PrivateKeyEntry
@@ -106,7 +118,7 @@ class MessageAdapter(private val messages: List<Message>, private val currentUse
     }
     fun decryptMessage(encryptedMessage: String, privateKey: PrivateKey?): String? {
         try {
-
+            Log.d("working test", "its working here 7")
             val messageWithoutNewLines = encryptedMessage.replace(Regex("""(\r\n)|\n"""), "")
             Log.d("Message", "encrypted message: ${encryptedMessage}")
 
