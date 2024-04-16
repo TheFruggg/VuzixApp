@@ -54,8 +54,9 @@ class MessagesActivity : AppCompatActivity() {
                 documents.forEach { document ->
                     val senderId = document.getString("senderId") ?: ""
                     val content = document.getString("content") ?: ""
+                    val history = document.getLong("history")?.toInt() ?: 0
                     val timestamp = document.getTimestamp("timestamp") ?: Timestamp.now()
-                    messages.add(Message(senderId, userId ?: "", content, timestamp))
+                    messages.add(Message(senderId, userId ?: "", content,history, timestamp))
                 }
                 //updateUI(messages)
             }
@@ -81,7 +82,8 @@ class MessagesActivity : AppCompatActivity() {
                     val recipientId = document.getString("recipientId") ?: ""
                     val content = document.getString("content") ?: ""
                     val timestamp = document.getTimestamp("timestamp") ?: Timestamp.now()
-                    messages.add(Message(userId ?: "", recipientId, content, timestamp))
+                    val history = document.getLong("history")?.toInt() ?: 0
+                    messages.add(Message(userId ?:"", recipientId , content,history, timestamp))
                     //allMessages.add(message)
                     Log.d("working messages activity", "its working here 4")
                 }
@@ -98,8 +100,9 @@ class MessagesActivity : AppCompatActivity() {
                         documents.forEach { document ->
                             val recipientId = document.getString("recipientId") ?: ""
                             val content = document.getString("content") ?: ""
+                            val history = document.getLong("history")?.toInt() ?: 0
                             val timestamp = document.getTimestamp("timestamp") ?: Timestamp.now()
-                            messages.add(Message(userId ?: "", recipientId, content, timestamp))
+                            messages.add(Message(recipientId, userId ?:"" , content,history, timestamp))
                         }
 
                         // Sort messages by timestamp in ascending order

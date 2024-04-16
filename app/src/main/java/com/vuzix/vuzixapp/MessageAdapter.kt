@@ -160,7 +160,7 @@ class MessageAdapter(private val messages: List<Message>, private val currentUse
     // Determine the view type for the message (received or sent)
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
-        return if (message.senderId == currentUserId) SENT_MESSAGE else RECEIVED_MESSAGE
+        return if (message.history == 1) SENT_MESSAGE else RECEIVED_MESSAGE
     }
 
 }
