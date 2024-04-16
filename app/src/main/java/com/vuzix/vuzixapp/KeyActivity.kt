@@ -62,24 +62,24 @@ class KeyActivity : AppCompatActivity() {
             val keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
 
-            if (!keyStore.containsAlias(SYMMETRIC_KEY_ALIAS)) {
-                val keyGenerator = KeyGenerator.getInstance(
-                    KeyProperties.KEY_ALGORITHM_AES,
-                    ANDROID_KEYSTORE_PROVIDER
-                )
 
-                val keyGenParameterSpec = KeyGenParameterSpec.Builder(
-                    SYMMETRIC_KEY_ALIAS,
-                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-                )
-                    .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-                    .setKeySize(256) // Adjust key size as needed
-                    .build()
+            val keyGenerator = KeyGenerator.getInstance(
+                KeyProperties.KEY_ALGORITHM_AES,
+                ANDROID_KEYSTORE_PROVIDER
+            )
 
-                keyGenerator.init(keyGenParameterSpec)
-                keyGenerator.generateKey()
-            }
+            val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+                SYMMETRIC_KEY_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
+                .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                .setKeySize(256) // Adjust key size as needed
+                .build()
+
+            keyGenerator.init(keyGenParameterSpec)
+            keyGenerator.generateKey()
+
 
             return SYMMETRIC_KEY_ALIAS
 
