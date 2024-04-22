@@ -3,6 +3,7 @@ package com.vuzix.vuzixapp
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,14 +13,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Hide the status bar and make the activity fullscreen
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        //SYSTEM_UI_FLAG_FULLSCREEN.also { window.decorView.systemUiVisibility = it }
 
         // Set content view using the layout for the main activity
         setContentView(R.layout.activity_main)
 
         // Define options for the menu
         val options = listOf(
-            "New Message", "Chats", "Contacts", "Settings", "Test", "Exit"
+            "New Message", "Chats", "Exit"
         )
 
         // Initialize and set up RecyclerView for displaying menu options horizontally
@@ -32,10 +33,7 @@ class MainActivity : AppCompatActivity() {
             when (position) {
                 0 -> navigateTo(NewMessageActivity::class.java)
                 1 -> navigateTo(ChatActivity::class.java)
-                2 -> navigateTo(ContactsActivity::class.java)
-                3 -> navigateTo(SettingsActivity::class.java)
-                4 -> KeyActivity().GenerateKeyPair() // Example of calling a function from another activity
-                5 -> finish() // Exit the application
+                2 -> finish() // Exit the application
             }
         }
     }
