@@ -57,6 +57,7 @@ class CreateAccountActivity : AppCompatActivity() {
             return
         }
 
+        //create public key
         val publicKeyString = KeyActivity().GenerateKeyPair()
 
 

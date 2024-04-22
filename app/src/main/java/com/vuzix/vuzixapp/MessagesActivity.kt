@@ -43,27 +43,7 @@ class MessagesActivity : AppCompatActivity() {
         Log.d("working messages activity", "its working here 2")
     }
 
-    private fun fetchMessagesForConversationold(conversationId: String) {
-        db.collection("conversations")
-            .document(conversationId)
-            .collection("messages")
-            .orderBy("timestamp", Query.Direction.ASCENDING)
-            .get()
-            .addOnSuccessListener { documents ->
-                val messages = mutableListOf<Message>()
-                documents.forEach { document ->
-                    val senderId = document.getString("senderId") ?: ""
-                    val content = document.getString("content") ?: ""
-                    val history = document.getLong("history")?.toInt() ?: 0
-                    val timestamp = document.getTimestamp("timestamp") ?: Timestamp.now()
-                    messages.add(Message(senderId, userId ?: "", content,history, timestamp))
-                }
-                //updateUI(messages)
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error fetching messages: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
+
     private fun fetchMessagesForConversation(conversationId: String) {
         // List to hold all fetched messages
         val messages = mutableListOf<Message>()
@@ -109,7 +89,7 @@ class MessagesActivity : AppCompatActivity() {
                         messages.sortBy { it.timestamp }
 
                         // Initialize and set up MessageAdapter with fetched messages
-                        Log.d("working messages activity", "help help help")
+
                         messageAdapter = MessageAdapter(messages, userId ?: "")
                         messagesRecyclerView.adapter = messageAdapter
                     }
