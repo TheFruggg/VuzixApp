@@ -7,6 +7,7 @@ import android.util.Base64
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import java.security.KeyPairGenerator
+import javax.crypto.KeyGenerator
 import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.PublicKey
@@ -15,8 +16,9 @@ import javax.crypto.Cipher
 
 class KeyActivity : AppCompatActivity() {
 
-    private val KEY_ALIAS = "MyKeyAlias" // Alias for the generated key pair
-
+    private val KEY_ALIAS = "MyKeyAlias"
+    private val SYMMETRIC_KEY_ALIAS = "MySymmetricKeyAlias"
+    private val ANDROID_KEYSTORE_PROVIDER = "AndroidKeyStore"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,8 +34,8 @@ class KeyActivity : AppCompatActivity() {
             // Generate key pair using KeyPairGenerator
             generateKeyPairUsingKeyPairGenerator()
 
-            // Retrieve the private key
-            val privateKey = keyStore.getKey(KEY_ALIAS, null) as PrivateKey
+            generateSymmetricKey()
+
 
             // Retrieve the public key
             val publicKey = keyStore.getCertificate(KEY_ALIAS).publicKey
@@ -51,6 +53,38 @@ class KeyActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
             Log.e("KeyPairGeneration", "Error generating key pair", e)
+            throw e
+        }
+
+    }
+    fun generateSymmetricKey(): String {
+        try {
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
+
+
+            val keyGenerator = KeyGenerator.getInstance(
+                KeyProperties.KEY_ALGORITHM_AES,
+                ANDROID_KEYSTORE_PROVIDER
+            )
+
+            val keyGenParameterSpec = KeyGenParameterSpec.Builder(
+                SYMMETRIC_KEY_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
+                .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                .setKeySize(256) // Adjust key size as needed
+                .build()
+
+            keyGenerator.init(keyGenParameterSpec)
+            keyGenerator.generateKey()
+
+
+            return SYMMETRIC_KEY_ALIAS
+
+        } catch (e: Exception) {
+            e.printStackTrace()
             throw e
         }
     }

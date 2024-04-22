@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
         // Define options for the menu
         val options = listOf(
-            "New Message", "Chats", "Contacts", "Settings", "Test", "Exit"
+            "New Message", "Chats", "Exit"
         )
 
         // Initialize and set up RecyclerView for displaying menu options horizontally
@@ -32,10 +32,7 @@ class MainActivity : AppCompatActivity() {
             when (position) {
                 0 -> navigateTo(NewMessageActivity::class.java)
                 1 -> navigateTo(ChatActivity::class.java)
-                2 -> navigateTo(ContactsActivity::class.java)
-                3 -> navigateTo(SettingsActivity::class.java)
-                4 -> KeyActivity().GenerateKeyPair() // Example of calling a function from another activity
-                5 -> finish() // Exit the application
+                2 -> finish() // Exit the application
             }
         }
     }

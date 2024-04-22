@@ -1,6 +1,7 @@
 package com.vuzix.vuzixapp
 
 import android.os.Bundle
+import android.util.Log
 import android.os.Handler
 import android.os.Looper
 import android.view.KeyEvent
@@ -37,6 +38,7 @@ class MessagesActivity : AppCompatActivity() {
         // Retrieve conversation and recipient details from intent
         conversationId = intent.getStringExtra("conversationId") ?: ""
         recipientId = intent.getStringExtra("recipientId")
+
 
         // Check if conversation details are available
         if (conversationId.isBlank() || recipientId.isNullOrEmpty()) {
@@ -84,25 +86,60 @@ class MessagesActivity : AppCompatActivity() {
         }
     }
 
-    // Fetch messages for the conversation from Firestore
+
     private fun fetchMessagesForConversation(conversationId: String) {
+        // List to hold all fetched messages
+        val messages = mutableListOf<Message>()
+        Log.d("working messages activity", "its working here 3")
+
+        // Fetch sent messages with history = 1
         db.collection("conversations")
             .document(conversationId)
             .collection("messages")
-            .orderBy("timestamp", Query.Direction.ASCENDING)
+            .whereEqualTo("senderId", userId ?: "")
+            .whereEqualTo("history", 1) // Filter messages by history field set to 1
             .get()
             .addOnSuccessListener { documents ->
-                val messages = mutableListOf<Message>()
+                // Iterate through documents to extract sent message data
                 documents.forEach { document ->
-                    val senderId = document.getString("senderId") ?: ""
+                    val recipientId = document.getString("recipientId") ?: ""
                     val content = document.getString("content") ?: ""
                     val timestamp = document.getTimestamp("timestamp") ?: Timestamp.now()
-                    messages.add(Message(senderId, userId ?: "", content, timestamp))
+                    val history = document.getLong("history")?.toInt() ?: 0
+                    messages.add(Message(userId ?:"", recipientId , content,history, timestamp))
+                    //allMessages.add(message)
+                    Log.d("working messages activity", "its working here 4")
                 }
-                updateUI(messages)
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error fetching messages: ${e.message}", Toast.LENGTH_SHORT).show()
+
+                // Fetch sent messages with history = 0
+                db.collection("conversations")
+                    .document(conversationId)
+                    .collection("messages")
+                    .whereEqualTo("recipientId", userId ?: "")
+                    .whereEqualTo("history", 0) // Filter messages by history field set to 0
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        // Iterate through documents to extract sent message data with history = 0
+                        documents.forEach { document ->
+                            val recipientId = document.getString("recipientId") ?: ""
+                            val content = document.getString("content") ?: ""
+                            val history = document.getLong("history")?.toInt() ?: 0
+                            val timestamp = document.getTimestamp("timestamp") ?: Timestamp.now()
+                            messages.add(Message(recipientId, userId ?:"" , content,history, timestamp))
+                        }
+
+                        // Sort messages by timestamp in ascending order
+                        messages.sortBy { it.timestamp }
+
+                        // Initialize and set up MessageAdapter with fetched messages
+                        Log.d("working messages activity", "help help help")
+                        messageAdapter = MessageAdapter(messages, userId ?: "")
+                        messagesRecyclerView.adapter = messageAdapter
+                        updateUI(messages)
+                    }
+                    .addOnFailureListener { exception ->
+                        // Handle errors
+                    }
             }
     }
 
@@ -114,47 +151,78 @@ class MessagesActivity : AppCompatActivity() {
     }
 
     // Send message to the conversation so the user doesn't have to leave this page to send a message
+
+
+
     private fun sendMessage(content: String) {
-        val messageMap = hashMapOf(
-            "senderId" to userId,
-            "recipientId" to recipientId,
-            "content" to content,
-            "timestamp" to FieldValue.serverTimestamp()
-        )
+        val db = FirebaseFirestore.getInstance()
+        val usersRef = db.collection("users")
 
-        db.collection("conversations").document(conversationId).collection("messages").add(messageMap)
-            .addOnSuccessListener {
-                fetchMessagesForConversation(conversationId)
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
+        // Directly get the document with the provided user ID
+        recipientId?.let { recipientId ->
+            usersRef.document(recipientId)
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val recipientPublicKey = document.getString("Public") ?: ""
+                        userId?.let { userId ->
+                            recipientId.let {
+                                NewMessageActivity().addMessageToConversation(
+                                    conversationId, userId, recipientId, content,recipientPublicKey)
 
-    // Handle navigation through messages using the weird ass touch pad on the glasses
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        when (keyCode) {
-            KeyEvent.KEYCODE_DPAD_UP -> {
-                messagesRecyclerView.smoothScrollBy(0, -layoutManager.height / 4)
-                return true
-            }
-            KeyEvent.KEYCODE_DPAD_DOWN -> {
-                messagesRecyclerView.smoothScrollBy(0, layoutManager.height / 4)
-                return true
-            }
+                                NewMessageActivity().addMessageToHistory(
+                                    conversationId, userId, recipientId, content)
+
+                            }
+                        }
+                    } else {
+                        println("No user found with ID: $recipientId")
+                    }
+                }
+                .addOnFailureListener { e ->
+                    println("Error getting user: $e")
+                }
+        } ?: run {
+            println("Recipient ID is null")
         }
-        return super.onKeyDown(keyCode, event)
     }
 
-    // Pause the refresh task when the activity is paused
-    override fun onPause() {
-        super.onPause()
-        refreshHandler.removeCallbacks(refreshRunnable)
-    }
 
-    // Resume the refresh task when the activity is resumed
-    override fun onResume() {
-        super.onResume()
-        refreshHandler.post(refreshRunnable)
-    }
-}
+
+
+
+
+
+
+
+
+
+                    // Handle navigation through messages using the weird ass touch pad on the glasses
+                    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+                        when (keyCode) {
+                            KeyEvent.KEYCODE_DPAD_UP -> {
+                                messagesRecyclerView.smoothScrollBy(0, -layoutManager.height / 4)
+                                return true
+                            }
+
+                            KeyEvent.KEYCODE_DPAD_DOWN -> {
+                                messagesRecyclerView.smoothScrollBy(0, layoutManager.height / 4)
+                                return true
+                            }
+                        }
+                        return super.onKeyDown(keyCode, event)
+                    }
+
+                    // Pause the refresh task when the activity is paused
+                    override fun onPause() {
+                        super.onPause()
+                        refreshHandler.removeCallbacks(refreshRunnable)
+                    }
+
+                    // Resume the refresh task when the activity is resumed
+                    override fun onResume() {
+                        super.onResume()
+                        refreshHandler.post(refreshRunnable)
+                    }
+                }
+

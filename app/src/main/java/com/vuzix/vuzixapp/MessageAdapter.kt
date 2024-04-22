@@ -12,6 +12,8 @@ import java.security.KeyStore
 import java.security.PrivateKey
 import javax.crypto.Cipher
 import java.util.Base64
+import javax.crypto.SecretKey
+import javax.crypto.spec.IvParameterSpec
 
 class MessageAdapter(private val messages: List<Message>, private val currentUserId: String) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -51,21 +53,50 @@ class MessageAdapter(private val messages: List<Message>, private val currentUse
         //val byteArrayMessage = messageToByteArray(message.content)
         //val decodedKey = android.util.Base64.decode(message, android.util.Base64.DEFAULT)
         //val byteArrayMessage = Base64.decode(message, Base64.DEFAULT)
-        val privateKey = getPrivateKey(keyAlias)
-        val decryptedMessage = decryptMessage(message.content,privateKey)
+
 
         if (holder.itemViewType == RECEIVED_MESSAGE) {
+            Log.d("working test", "private key test")
+            val privateKey = getPrivateKey(keyAlias)
+            val decryptedMessage = decryptMessage(message.content,privateKey)
             // Bind received message content to ReceivedMessageViewHolder
             val receivedHolder = holder as ReceivedMessageViewHolder
             receivedHolder.textViewReceivedMessage.text = decryptedMessage
         } else {
-            // Bind sent message content to SentMessageViewHolder
-            val sentHolder = holder as SentMessageViewHolder
-            sentHolder.textViewSentMessage.text = decryptedMessage
+            Log.d("working test", "its working here 4")
+            val secretKey =NewMessageActivity().retrieveSymmetricKey()
+            if (secretKey != null) {
+                Log.d("working test", "its working here 69")
+                val decryptedMessage = decryptSymmetricMessage(message.content, secretKey)
+                // Bind sent message content to SentMessageViewHolder
+                val sentHolder = holder as SentMessageViewHolder
+                sentHolder.textViewSentMessage.text = decryptedMessage
+            }
         }
     }
-    fun messageToByteArray(message: String): ByteArray {
-        return message.toByteArray()
+
+
+    fun decryptSymmetricMessage(encryptedMessage: String, secretKey: SecretKey): String {
+        try {
+            Log.d("working test", "symmetric key test")
+            val messageWithoutNewLines = encryptedMessage.replace(Regex("""(\r\n)|\n"""), "")
+            val originalData = Base64.getDecoder().decode(messageWithoutNewLines)
+            //val originalData = encryptedMessage.toByteArray(Charsets.UTF_8)
+            Log.d("working test", "its working here glizz")
+            val iv = originalData.copyOfRange(0, 16) // Extract IV from encrypted data
+            Log.d("working test", "its working here 7")
+            val encryptedBytes = originalData.copyOfRange(16, originalData.size)
+            Log.d("working test", "its working here 8")
+            val cipher = Cipher.getInstance("AES/CBC/PKCS7Padding")
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
+            Log.d("working test", "symmetric key worked")
+            val decryptedBytes = cipher.doFinal(encryptedBytes)
+            return String(decryptedBytes)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return "message decryption for symmetric failed"
+        }
     }
     fun getPrivateKey(keyAlias: String): PrivateKey? {
         return try {
@@ -124,7 +155,7 @@ class MessageAdapter(private val messages: List<Message>, private val currentUse
     // Determine the view type for the message (received or sent)
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
-        return if (message.senderId == currentUserId) SENT_MESSAGE else RECEIVED_MESSAGE
+        return if (message.history == 1) SENT_MESSAGE else RECEIVED_MESSAGE
     }
 
 }
