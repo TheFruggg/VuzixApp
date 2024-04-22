@@ -16,8 +16,6 @@ import javax.crypto.Cipher
 
 class KeyActivity : AppCompatActivity() {
 
-    // create key alias
-    // for future development alias should be created unique to each user
     private val KEY_ALIAS = "MyKeyAlias"
     private val SYMMETRIC_KEY_ALIAS = "MySymmetricKeyAlias"
     private val ANDROID_KEYSTORE_PROVIDER = "AndroidKeyStore"
@@ -26,16 +24,16 @@ class KeyActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 
-    //Generate user key pair and symmetric key
+    // Function to generate RSA key pair and return the Base64 encoded public key
     fun GenerateKeyPair(): String {
         try {
-            //initalise
+            // Initialize KeyStore instance
             val keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
 
-            // generate public private key pair
+            // Generate key pair using KeyPairGenerator
             generateKeyPairUsingKeyPairGenerator()
-            //generate symmetric key
+
             generateSymmetricKey()
 
 
@@ -43,17 +41,14 @@ class KeyActivity : AppCompatActivity() {
             val publicKey = keyStore.getCertificate(KEY_ALIAS).publicKey
 
             // Log the public key
-            //logPublicKey(publicKey)
+            logPublicKey(publicKey)
 
-            // encode public key to string to allow storage in database
+            // Convert public key to Base64 string
             val publicKeyString = Base64.encodeToString(publicKey.encoded, Base64.DEFAULT)
-
-
 
             // Display success message
             Log.d("KeyPairGeneration", "Key pair generated successfully!")
             return publicKeyString
-
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -64,7 +59,6 @@ class KeyActivity : AppCompatActivity() {
     }
     fun generateSymmetricKey(): String {
         try {
-            //initialise keystore
             val keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
 
@@ -74,7 +68,6 @@ class KeyActivity : AppCompatActivity() {
                 ANDROID_KEYSTORE_PROVIDER
             )
 
-            //specify key specs
             val keyGenParameterSpec = KeyGenParameterSpec.Builder(
                 SYMMETRIC_KEY_ALIAS,
                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
@@ -84,7 +77,6 @@ class KeyActivity : AppCompatActivity() {
                 .setKeySize(256) // Adjust key size as needed
                 .build()
 
-            //generate key
             keyGenerator.init(keyGenParameterSpec)
             keyGenerator.generateKey()
 
@@ -97,27 +89,27 @@ class KeyActivity : AppCompatActivity() {
         }
     }
 
-    //generate public key and private key pair
+    // Function to generate RSA key pair using KeyPairGenerator
     private fun generateKeyPairUsingKeyPairGenerator() {
         try {
-            //initialise rsa algorithm
             val keyPairGenerator = KeyPairGenerator.getInstance(
                 KeyProperties.KEY_ALGORITHM_RSA,
                 "AndroidKeyStore"
             )
-            //initialise key specs
+
+            // Initialize KeyGenParameterSpec for RSA key pair generation
             keyPairGenerator.initialize(
                 KeyGenParameterSpec.Builder(
                     KEY_ALIAS,
                     KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
                 )
-                    .setKeySize(2048)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
-                    .setUserAuthenticationRequired(false)
+                    .setKeySize(2048) // Set key size to 2048 bits
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1) // Set encryption padding
+                    .setUserAuthenticationRequired(false) // User authentication not required
                     .build()
             )
 
-            //generate keys
+            // Generate key pair
             keyPairGenerator.generateKeyPair()
 
         } catch (e: Exception) {
@@ -125,9 +117,10 @@ class KeyActivity : AppCompatActivity() {
         }
     }
 
-    //log the generation of the public key for testing purposes
+    // Function to log the public key
     private fun logPublicKey(publicKey: PublicKey) {
         try {
+            // Convert public key to Base64 string and log it
             val encodedPublicKey = Base64.encode(publicKey.encoded, Base64.NO_WRAP)
             val publicKeyString = String(encodedPublicKey)
             Log.d("KeyPairGeneration", "Public Key: $publicKeyString")

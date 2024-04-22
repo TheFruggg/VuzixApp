@@ -70,13 +70,11 @@ class NewMessageActivity : AppCompatActivity() {
             }
 
             // Lookup recipient user ID in Firestore
-            //then retrieve the users public key
             db.collection("users")
                 .whereEqualTo("email", recipientEmail)
                 .get()
                 .addOnSuccessListener { documents ->
                     for (document in documents) {
-                        //get public key
                         val recipientPublicKey = document.getString("Public") ?: ""
                         val recipientId = document.id
                         checkConversationExists(senderId, recipientId, messageContent, recipientPublicKey)
@@ -109,7 +107,6 @@ class NewMessageActivity : AppCompatActivity() {
                 if (matchingConversation != null) {
                     // Conversation already exists, add message to it
                     val conversationId = matchingConversation.id
-                    //send 2 versions of the message one with symmetric key encryption the other asymmetric
                     addMessageToConversation(conversationId, senderId, recipientId, messageContent,recipientPublicKey)
                     addMessageToHistory(conversationId, senderId, recipientId, messageContent)
                 } else {
@@ -134,7 +131,6 @@ class NewMessageActivity : AppCompatActivity() {
             .addOnSuccessListener { documentReference ->
                 // Conversation created successfully, now add message to it
                 val conversationId = documentReference.id
-                //send 2 versions of the message one with symmetric key encryption the other asymmetric
                 addMessageToConversation(conversationId, senderId, recipientId, messageContent, recipientPublicKey)
                 addMessageToHistory(conversationId, senderId, recipientId, messageContent)
             }
@@ -144,33 +140,29 @@ class NewMessageActivity : AppCompatActivity() {
             }
     }
 
-    // Function to add message to an existing conversation for the viewing of the recipient
-    // The history field is set to 0 to indicate its for the recipient user which will be decrypteed with their private key
-    private fun addMessageToConversation(conversationId: String, senderId: String, recipientId: String, messageContent: String, publicKeyString : String) {
+    // Function to add message to an existing conversation
+    fun addMessageToConversation(conversationId: String, senderId: String, recipientId: String, messageContent: String, publicKeyString : String) {
+        val db = FirebaseFirestore.getInstance()
         val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
-
-        // history set to 0 to show it's to be encrypted by public key
         val history = 0
-
-        //makes sure public key is in correct format
+        Log.d("public key", "public key before decoding: ${publicKeyString}")
         val publicKeyStringWithoutNewlines = publicKeyString.replace("\n", "")
-        //decode key from string to byte array
         val decodedKey = android.util.Base64.decode(publicKeyStringWithoutNewlines, android.util.Base64.DEFAULT)
 
-        //sets up rsa encryption
         val keyFactory = java.security.KeyFactory.getInstance("RSA")
         val recipientPublicKey = keyFactory.generatePublic(X509EncodedKeySpec(decodedKey))
-        //Log.d("public key", "public key after decoding: ${recipientPublicKey}")
+        Log.d("public key", "public key after decoding: ${recipientPublicKey}")
         val cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
         cipher.init(Cipher.ENCRYPT_MODE, recipientPublicKey)
-
-        //encrypts the message
         val encryptedBytes = cipher.doFinal(messageContent.toByteArray())
-
-        //converts message to string
         val encryptedMessage = android.util.Base64.encodeToString(encryptedBytes, android.util.Base64.DEFAULT)
 
-        // sets message values
+
+
+        // Return the encrypted message as Base64 encoded string
+
+
+
         val message = hashMapOf(
             "senderId" to senderId,
             "recipientId" to recipientId,
@@ -179,22 +171,21 @@ class NewMessageActivity : AppCompatActivity() {
             "timestamp" to FieldValue.serverTimestamp() // Use server timestamp
 
         )
-        //send message
+
         messagesRef.add(message)
             .addOnSuccessListener { documentReference ->
                 // Message sent successfully
-                Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT).show()
                 // Optionally, clear the message input field or navigate to another screen
             }
             .addOnFailureListener { e ->
                 // Failed to send message
-                Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    // Function to add message to an existing conversation for the viewing of the sender
-    // The history field is set to 1 to indicate its for the sender user which will be decrypted with their symmetric key
-    private fun addMessageToHistory(conversationId: String, senderId: String, recipientId: String, messageContent: String) {
+    fun addMessageToHistory(conversationId: String, senderId: String, recipientId: String, messageContent: String) {
+        val db = FirebaseFirestore.getInstance()
         val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
         val history = 1
 
@@ -215,12 +206,12 @@ class NewMessageActivity : AppCompatActivity() {
             messagesRef.add(message)
                 .addOnSuccessListener { documentReference ->
                     // Message sent successfully
-                    Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT).show()
                     // Optionally, clear the message input field or navigate to another screen
                 }
                 .addOnFailureListener { e ->
                     // Failed to send message
-                    Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
 
