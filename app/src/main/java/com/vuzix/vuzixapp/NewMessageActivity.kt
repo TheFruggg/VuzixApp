@@ -141,7 +141,8 @@ class NewMessageActivity : AppCompatActivity() {
     }
 
     // Function to add message to an existing conversation
-    private fun addMessageToConversation(conversationId: String, senderId: String, recipientId: String, messageContent: String, publicKeyString : String) {
+    fun addMessageToConversation(conversationId: String, senderId: String, recipientId: String, messageContent: String, publicKeyString : String) {
+        val db = FirebaseFirestore.getInstance()
         val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
         val history = 0
         Log.d("public key", "public key before decoding: ${publicKeyString}")
@@ -174,16 +175,17 @@ class NewMessageActivity : AppCompatActivity() {
         messagesRef.add(message)
             .addOnSuccessListener { documentReference ->
                 // Message sent successfully
-                Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT).show()
                 // Optionally, clear the message input field or navigate to another screen
             }
             .addOnFailureListener { e ->
                 // Failed to send message
-                Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun addMessageToHistory(conversationId: String, senderId: String, recipientId: String, messageContent: String) {
+    fun addMessageToHistory(conversationId: String, senderId: String, recipientId: String, messageContent: String) {
+        val db = FirebaseFirestore.getInstance()
         val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
         val history = 1
 
@@ -204,12 +206,12 @@ class NewMessageActivity : AppCompatActivity() {
             messagesRef.add(message)
                 .addOnSuccessListener { documentReference ->
                     // Message sent successfully
-                    Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this, "Message sent successfully", Toast.LENGTH_SHORT).show()
                     // Optionally, clear the message input field or navigate to another screen
                 }
                 .addOnFailureListener { e ->
                     // Failed to send message
-                    Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
 
