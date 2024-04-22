@@ -92,8 +92,9 @@ class NewMessageActivity : AppCompatActivity() {
     }
 
     // Function to check if conversation exists and create it if necessary
-    private fun checkConversationExists(senderId: String, recipientId: String, messageContent: String, recipientPublicKey: String) {
+    fun checkConversationExists(senderId: String, recipientId: String, messageContent: String, recipientPublicKey: String) {
         // Fetch all conversations for the sender
+        db = FirebaseFirestore.getInstance()
         db.collection("conversations")
             .whereArrayContains("participants", senderId)
             .get()
@@ -107,6 +108,7 @@ class NewMessageActivity : AppCompatActivity() {
                 if (matchingConversation != null) {
                     // Conversation already exists, add message to it
                     val conversationId = matchingConversation.id
+                    //Toast.makeText(this, "ADD message conversation: ", Toast.LENGTH_SHORT).show()
                     addMessageToConversation(conversationId, senderId, recipientId, messageContent,recipientPublicKey)
                     addMessageToHistory(conversationId, senderId, recipientId, messageContent)
                 } else {
@@ -142,7 +144,7 @@ class NewMessageActivity : AppCompatActivity() {
 
     // Function to add message to an existing conversation
     fun addMessageToConversation(conversationId: String, senderId: String, recipientId: String, messageContent: String, publicKeyString : String) {
-        val db = FirebaseFirestore.getInstance()
+        //val db = FirebaseFirestore.getInstance()
         val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
         val history = 0
         Log.d("public key", "public key before decoding: ${publicKeyString}")
@@ -180,12 +182,12 @@ class NewMessageActivity : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 // Failed to send message
-                //Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
     fun addMessageToHistory(conversationId: String, senderId: String, recipientId: String, messageContent: String) {
-        val db = FirebaseFirestore.getInstance()
+        //val db = FirebaseFirestore.getInstance()
         val messagesRef = db.collection("conversations").document(conversationId).collection("messages")
         val history = 1
 
@@ -211,7 +213,7 @@ class NewMessageActivity : AppCompatActivity() {
                 }
                 .addOnFailureListener { e ->
                     // Failed to send message
-                    //Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
 

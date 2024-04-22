@@ -20,6 +20,8 @@ import com.google.firebase.firestore.Query
 class MessagesActivity : AppCompatActivity() {
     private val db = FirebaseFirestore.getInstance()
     private val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+
     private lateinit var messagesRecyclerView: RecyclerView
     private lateinit var messageAdapter: MessageAdapter
     private lateinit var editTextMessageReply: EditText
@@ -37,15 +39,10 @@ class MessagesActivity : AppCompatActivity() {
 
         // Retrieve conversation and recipient details from intent
         conversationId = intent.getStringExtra("conversationId") ?: ""
-        recipientId = intent.getStringExtra("recipientId")
+        recipientId = intent.getStringExtra("recipientId") ?: ""
 
 
-        // Check if conversation details are available
-        if (conversationId.isBlank() || recipientId.isNullOrEmpty()) {
-            Toast.makeText(this, "Missing conversation details.", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
+
 
         // Initialize views and setup send button
         initViews()
@@ -80,6 +77,7 @@ class MessagesActivity : AppCompatActivity() {
         buttonSendReply.setOnClickListener {
             val messageContent = editTextMessageReply.text.toString()
             if (messageContent.isNotBlank()) {
+                Log.d("warning warning help", "its working here")
                 sendMessage(messageContent)
                 editTextMessageReply.text.clear()
             }
@@ -90,7 +88,7 @@ class MessagesActivity : AppCompatActivity() {
     private fun fetchMessagesForConversation(conversationId: String) {
         // List to hold all fetched messages
         val messages = mutableListOf<Message>()
-        Log.d("working messages activity", "its working here 3")
+
 
         // Fetch sent messages with history = 1
         db.collection("conversations")
@@ -155,40 +153,74 @@ class MessagesActivity : AppCompatActivity() {
 
 
     private fun sendMessage(content: String) {
-        val db = FirebaseFirestore.getInstance()
-        val usersRef = db.collection("users")
+        //conversationId = intent.getStringExtra("conversationId") ?: ""
 
-        // Directly get the document with the provided user ID
-        recipientId?.let { recipientId ->
-            usersRef.document(recipientId)
-                .get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        val recipientPublicKey = document.getString("Public") ?: ""
-                        userId?.let { userId ->
-                            recipientId.let {
-                                NewMessageActivity().addMessageToConversation(
-                                    conversationId, userId, recipientId, content,recipientPublicKey)
 
-                                NewMessageActivity().addMessageToHistory(
-                                    conversationId, userId, recipientId, content)
 
-                            }
+        db.collection("conversations").document(conversationId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    // Step 2: Get the list of participants
+                    val participants = document.get("participants") as? List<String>
+
+                    // Check if the participants list contains the originalUserId
+                    participants?.let {
+                        // Find the other user
+                        val recipientId = it.firstOrNull { id -> id != userId }
+
+                        recipientId?.let { recipientId ->
+                            // Step 3: Get the public key of the other user
+                            db.collection("users").document(recipientId)
+                                .get()
+                                .addOnSuccessListener { userDoc ->
+                                    val recipientPublicKey = userDoc.getString("Public")
+
+                                    if (recipientPublicKey != null) {
+                                        if (userId != null) {
+                                            NewMessageActivity().checkConversationExists(userId, recipientId, content, recipientPublicKey )
+                                        }
+                                    } else {
+
+                                    }
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(
+                                        this,
+                                        "Error retrieving user data: ${e.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                        } ?: run {
+                            Toast.makeText(
+                                this,
+                                "Other user ID not found in conversation",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    } else {
-                        println("No user found with ID: $recipientId")
+                    } ?: run {
+                        Toast.makeText(
+                            this,
+                            "No participants in conversation",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Conversation not found",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                .addOnFailureListener { e ->
-                    println("Error getting user: $e")
-                }
-        } ?: run {
-            println("Recipient ID is null")
-        }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    this,
+                    "Error retrieving conversation: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
     }
-
-
-
 
 
 
