@@ -6,5 +6,5 @@
     android:padding="16dp"
     android:layout_margin="8dp"
     android:textSize="18sp"
-    android:textColor="@android:color/black"
-    android:background="@drawable/conversation_background"/>
+    android:textColor="#FFFFFF"
+    android:background="@drawable/conversation_selector"/>

@@ -87,7 +87,7 @@ class NewMessageActivity : AppCompatActivity() {
                     // Handle error
                     Toast.makeText(this, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
                 }
-
+            finish()
         }
     }
 
