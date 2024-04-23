@@ -11,19 +11,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import javax.crypto.SecretKey
-
-
-import java.security.KeyFactory
-
 import java.security.spec.X509EncodedKeySpec
-
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
-import java.security.KeyPairGenerator
 import java.security.KeyStore
-import java.security.PublicKey
-import java.security.Signature
-import java.util.Base64
 import javax.crypto.Cipher
 
 class NewMessageActivity : AppCompatActivity() {
