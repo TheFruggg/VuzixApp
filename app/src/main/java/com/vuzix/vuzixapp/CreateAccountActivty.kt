@@ -20,27 +20,18 @@ class CreateAccountActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Hide the status bar and make the activity fullscreen
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
-
-        // Set content view using the layout for creating an account
         setContentView(R.layout.activity_create_account)
-
-        // Initialize FirebaseAuth and FirebaseFirestore
         auth = Firebase.auth
         firestore = FirebaseFirestore.getInstance()
 
-        // Set click listener for the create account button
         val buttonCreateAccount: Button = findViewById(R.id.buttonCreateAccount)
         buttonCreateAccount.setOnClickListener {
             createAccount()
         }
     }
 
-    // Function to create a new user account
     private fun createAccount() {
-        // Get input values from EditText fields
         val editTextFirstName = findViewById<EditText>(R.id.editTextFirstName)
         val editTextLastName = findViewById<EditText>(R.id.editTextLastName)
         val editTextEmail = findViewById<EditText>(R.id.editTextEmail)
@@ -50,60 +41,48 @@ class CreateAccountActivity : AppCompatActivity() {
         val email = editTextEmail.text.toString()
         val password = editTextPassword.text.toString()
 
-        // Check if any field is empty
         if (email.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
-            // Display a toast message if any field is empty
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
             return
         }
 
-        //create public key
         val publicKeyString = KeyActivity().GenerateKeyPair()
 
-
-        Log.d("public key", "public key before decoding: ${publicKeyString}")
-        // Create user account with email and password
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign-up success, store user info in Firestore
-                    val user = hashMapOf(
-                        "Public" to publicKeyString,
-                        "firstName" to firstName,
-                        "lastName" to lastName,
-                        "email" to email
-                    )
-
-                    // Get current user ID
-                    val userId = auth.currentUser?.uid
-                    if (userId != null) {
-                        // Store user info in Firestore
-                        firestore.collection("users").document(userId)
-                            .set(user)
-                            .addOnSuccessListener {
-                                // User info stored successfully in Firestore
-                                Toast.makeText(this, "User created successfully", Toast.LENGTH_SHORT).show()
-                                navigateToLogin()
-                            }
-                            .addOnFailureListener { e ->
-                                // Failed to store user info in Firestore
-                                Toast.makeText(this, "Failed to create user: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-                    } else {
-                        // Display a toast message if user ID not found
-                        Toast.makeText(this, "User ID not found", Toast.LENGTH_SHORT).show()
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                auth.currentUser?.sendEmailVerification()?.addOnCompleteListener { verificationTask ->
+                    if (verificationTask.isSuccessful) {
+                        Toast.makeText(this, "Verification email sent to $email", Toast.LENGTH_SHORT).show()
                     }
-                } else {
-                    // If sign-up fails, display a message to the user.
-                    Toast.makeText(this, "Sign-up failed. Try again later.", Toast.LENGTH_SHORT).show()
                 }
+                val user = hashMapOf(
+                    "Public" to publicKeyString,
+                    "firstName" to firstName,
+                    "lastName" to lastName,
+                    "email" to email
+                )
+                val userId = auth.currentUser?.uid
+                if (userId != null) {
+                    firestore.collection("users").document(userId)
+                        .set(user)
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "User created successfully", Toast.LENGTH_SHORT).show()
+                            navigateToLogin()
+                        }.addOnFailureListener { e ->
+                            Toast.makeText(this, "Failed to create user: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                } else {
+                    Toast.makeText(this, "User ID not found", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(this, "Sign-up failed. Try again later.", Toast.LENGTH_SHORT).show()
             }
+        }
     }
 
-    // Function to navigate to the login activity
     private fun navigateToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent) // Start LoginActivity
-        finish() // Close the current activity
+        startActivity(intent)
+        finish()
     }
 }
