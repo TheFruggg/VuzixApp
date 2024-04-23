@@ -39,7 +39,7 @@ class MessageAdapter(private val messages: List<Message>, private val currentUse
             ReceivedMessageViewHolder(view)
 
         } else {
-            Log.d("working test", "its working here 1")
+
             // Inflate layout for sent message and return SentMessageViewHolder
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_sent_message, parent, false)
             SentMessageViewHolder(view)
