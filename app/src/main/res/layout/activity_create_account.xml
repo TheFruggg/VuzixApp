@@ -48,8 +48,15 @@
             android:inputType="textPassword"
             android:textColorHint="#FF69B4"
             android:background="@drawable/edit_text_outline"
-            android:paddingStart="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:paddingStart="12dp" />
+
+        <TextView
+            android:id="@+id/passwordRequirementsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Password must be 10+ chars with digit, uppercase, special char"
+            android:textSize="12sp"
+            android:textColor="#FF69B4" />
 
         <Button
             android:id="@+id/buttonCreateAccount"
