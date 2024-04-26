@@ -40,8 +40,16 @@ class CreateAccountActivity : AppCompatActivity() {
         val email = editTextEmail.text.toString()
         val password = editTextPassword.text.toString()
 
+        // Password validation criteria
+        val passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!-~])(?=\\S+$).{10,}$".toRegex()
+
         if (email.isEmpty() || password.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (!password.matches(passwordPattern)) {
+            Toast.makeText(this, "Invalid Password", Toast.LENGTH_SHORT).show()
             return
         }
 
